@@ -15,47 +15,49 @@
 
 
 
-#ifndef MB_SKINNER_HPP
-#define MB_SKINNER_HPP
+#ifndef MOAB_SKINNER_HPP
+#define MOAB_SKINNER_HPP
 
-#include "MBForward.hpp"
+#include "moab/Forward.hpp"
 #include <vector>
 
-class MBSkinner 
+namespace moab {
+
+class Skinner 
 {
 
   enum direction{FORWARD=1, REVERSE=-1};
 protected:
   //! the MB instance that this works with
-  MBInterface* thisMB;
+  Interface* thisMB;
 
-  MBTag mDeletableMBTag;
-  MBTag mAdjTag;
+  Tag mDeletableMBTag;
+  Tag mAdjTag;
   int mTargetDim;
 
 public:
   //! constructor, takes mdb instance
-  MBSkinner(MBInterface* mdb) 
+  Skinner(Interface* mdb) 
     : thisMB(mdb), mDeletableMBTag(0), mAdjTag(0){}
 
   //! destructor
-  ~MBSkinner();
+  ~Skinner();
 
-  MBErrorCode find_geometric_skin(MBRange &forward_target_entities);
+  ErrorCode find_geometric_skin(Range &forward_target_entities);
   
   // will accept entities all of one dimension
   // and return entities of n-1 dimension
-  MBErrorCode find_skin( const MBRange &entities,
+  ErrorCode find_skin( const Range &entities,
                          bool get_vertices,
-                         MBRange &output_handles,
-                         MBRange *output_reverse_handles = 0,
+                         Range &output_handles,
+                         Range *output_reverse_handles = 0,
                          bool create_vert_elem_adjs = false,
                          bool create_skin_elements = true);
 
     // get skin entities of prescribed dimension
-  MBErrorCode find_skin(const MBRange &entities,
+  ErrorCode find_skin(const Range &entities,
                         int dim,
-                        MBRange &skin_entities,
+                        Range &skin_entities,
                         bool create_vert_elem_adjs = false);
 
     /**\brief Find vertices on the skin of a set of mesh entities.
@@ -71,27 +73,27 @@ public:
      *                    will contain only those skin elements that already
      *                    exist.
      */
-  MBErrorCode find_skin_vertices( const MBRange& entities,
-                                  MBRange& skin_verts,
-                                  MBRange* skin_elems = 0,
+  ErrorCode find_skin_vertices( const Range& entities,
+                                  Range& skin_verts,
+                                  Range* skin_elems = 0,
                                   bool create_if_missing = true );
 
-  MBErrorCode classify_2d_boundary( const MBRange &boundary,
-                                     const MBRange &bar_elements,
-                                     MBEntityHandle boundary_edges,
-                                     MBEntityHandle inferred_edges,
-                                     MBEntityHandle non_manifold_edges,
-                                     MBEntityHandle other_edges,
+  ErrorCode classify_2d_boundary( const Range &boundary,
+                                     const Range &bar_elements,
+                                     EntityHandle boundary_edges,
+                                     EntityHandle inferred_edges,
+                                     EntityHandle non_manifold_edges,
+                                     EntityHandle other_edges,
                                      int &number_boundary_nodes);
   
   //!given a skin of dimension 2, will classify and return edges
   //! as boundary, inferred, and non-manifold, and the rest (other)
-  MBErrorCode classify_2d_boundary( const MBRange  &boundary,
-                                     const MBRange  &mesh_1d_elements,
-                                     MBRange  &boundary_edges,
-                                     MBRange  &inferred_edges,
-                                     MBRange  &non_manifold_edges,
-                                     MBRange  &other_edges,
+  ErrorCode classify_2d_boundary( const Range  &boundary,
+                                     const Range  &mesh_1d_elements,
+                                     Range  &boundary_edges,
+                                     Range  &inferred_edges,
+                                     Range  &non_manifold_edges,
+                                     Range  &other_edges,
                                      int &number_boundary_nodes);
 
 protected:
@@ -100,37 +102,37 @@ protected:
   
   void deinitialize();
 
-  MBErrorCode find_skin_noadj( const MBRange &source_entities,
-                               MBRange &forward_target_entities,
-                               MBRange &reverse_target_entities );
+  ErrorCode find_skin_noadj( const Range &source_entities,
+                               Range &forward_target_entities,
+                               Range &reverse_target_entities );
 
-  void add_adjacency(MBEntityHandle entity);
+  void add_adjacency(EntityHandle entity);
   
-  void add_adjacency(MBEntityHandle entity, const MBEntityHandle *conn,
+  void add_adjacency(EntityHandle entity, const EntityHandle *conn,
                      const int num_nodes);
 
-  MBErrorCode remove_adjacency(MBEntityHandle entity);
+  ErrorCode remove_adjacency(EntityHandle entity);
 
-  bool entity_deletable(MBEntityHandle entity);
+  bool entity_deletable(EntityHandle entity);
 
-  void find_match( MBEntityType type, 
-                   const MBEntityHandle *conn, 
+  void find_match( EntityType type, 
+                   const EntityHandle *conn, 
                    const int num_nodes,
-                   MBEntityHandle& match,
-                   MBSkinner::direction &direct);
+                   EntityHandle& match,
+                   Skinner::direction &direct);
 
-  bool connectivity_match(const MBEntityHandle *conn1,
-                          const MBEntityHandle *conn2,
+  bool connectivity_match(const EntityHandle *conn1,
+                          const EntityHandle *conn2,
                           const int num_verts,
-                          MBSkinner::direction &direct);
+                          Skinner::direction &direct);
 
-  void find_inferred_edges(MBRange &skin_boundary,
-                           MBRange &candidate_edges,
-                           MBRange &inferred_edges,
+  void find_inferred_edges(Range &skin_boundary,
+                           Range &candidate_edges,
+                           Range &inferred_edges,
                            double reference_angle_degrees);
 
-  bool has_larger_angle(MBEntityHandle &entity1,
-                       MBEntityHandle &entity2,
+  bool has_larger_angle(EntityHandle &entity1,
+                       EntityHandle &entity2,
                        double reference_angle_cosine);
 
 
@@ -147,10 +149,10 @@ protected:
      *                    will contain only those skin elements that already
      *                    exist.
      */
-  MBErrorCode find_skin_vertices( const MBRange& entities,
-                                  MBRange* skin_verts = 0,
-                                  MBRange* skin_elems = 0,
-                                  MBRange* rev_elems = 0,
+  ErrorCode find_skin_vertices( const Range& entities,
+                                  Range* skin_verts = 0,
+                                  Range* skin_elems = 0,
+                                  Range* rev_elems = 0,
                                   bool create_if_missing = true,
                                   bool corners_only = false );
 
@@ -158,9 +160,9 @@ protected:
    *
    * Return any vertices adjacent to exactly one of the input edges.
    */
-  MBErrorCode find_skin_vertices_1D( MBTag tag,
-                                     const MBRange& edges,
-                                     MBRange& skin_verts );
+  ErrorCode find_skin_vertices_1D( Tag tag,
+                                     const Range& edges,
+                                     Range& skin_verts );
                                      
   /**\brief Skin faces
    *
@@ -182,11 +184,11 @@ protected:
    *                  corners of sides will be returned (i.e. no higher-order
    *                  nodes.)  This argument is ignored if skin_verts is NULL.
    */
-  MBErrorCode find_skin_vertices_2D( MBTag tag,
-                                     const MBRange& faces,
-                                     MBRange* skin_verts = 0,
-                                     MBRange* skin_edges = 0,
-                                     MBRange* reverse_edges = 0,
+  ErrorCode find_skin_vertices_2D( Tag tag,
+                                     const Range& faces,
+                                     Range* skin_verts = 0,
+                                     Range* skin_edges = 0,
+                                     Range* reverse_edges = 0,
                                      bool create_edges = false,
                                      bool corners_only = false );
                                      
@@ -210,24 +212,25 @@ protected:
    *                  corners of sides will be returned (i.e. no higher-order
    *                  nodes.)  This argument is ignored if skin_verts is NULL.
    */
-  MBErrorCode find_skin_vertices_3D( MBTag tag,
-                                     const MBRange& entities,
-                                     MBRange* skin_verts = 0,
-                                     MBRange* skin_faces = 0,
-                                     MBRange* reverse_faces = 0,
+  ErrorCode find_skin_vertices_3D( Tag tag,
+                                     const Range& entities,
+                                     Range* skin_verts = 0,
+                                     Range* skin_faces = 0,
+                                     Range* reverse_faces = 0,
                                      bool create_faces = false,
                                      bool corners_only = false );
 
-  MBErrorCode create_side( MBEntityHandle element,
-                           MBEntityType side_type,
-                           const MBEntityHandle* side_corners,
-                           MBEntityHandle& side_elem_handle_out );
+  ErrorCode create_side( EntityHandle element,
+                           EntityType side_type,
+                           const EntityHandle* side_corners,
+                           EntityHandle& side_elem_handle_out );
                            
-  bool edge_reversed( MBEntityHandle face, const MBEntityHandle edge_ends[2] );
-  bool face_reversed( MBEntityHandle region, const MBEntityHandle* face_conn, 
-                      MBEntityType face_type );
+  bool edge_reversed( EntityHandle face, const EntityHandle edge_ends[2] );
+  bool face_reversed( EntityHandle region, const EntityHandle* face_conn, 
+                      EntityType face_type );
 };
 
+} // namespace moab 
 
 #endif
 

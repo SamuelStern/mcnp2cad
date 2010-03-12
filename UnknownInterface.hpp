@@ -1,4 +1,4 @@
-/*  Filename   :     MBUnkonwnInterface.h
+/*  Filename   :     UnkonwnInterface.h
  *  Creator    :     Clinton Stimpson
  *
  *  Date       :     10 Jan 2002
@@ -8,18 +8,16 @@
  *  Description:     Contains declarations for MBuuid which keeps
  *                   track of different interfaces.
  *                   Also contains the declaration for the base class
- *                   MBUknownInterface from which all interfaces are
+ *                   UknownInterface from which all interfaces are
  *                   derived from
  */
 
-#ifndef MBUNKNOWNINTERFACE_HPP
-#define MBUNKNOWNINTERFACE_HPP
+#ifndef MOAB_UNKNOWN_INTERFACE_HPP
+#define MOAB_UNKNOWN_INTERFACE_HPP
 
 #include <memory.h>
 
-typedef unsigned char   MBuchar;
-typedef unsigned short  MBushort;
-typedef unsigned        MBuint;
+namespace moab {
 
 //!  struct that handles universally unique id's for the Mesh Database
 
@@ -34,10 +32,10 @@ struct MBuuid
       memset( this, 0, sizeof(MBuuid) );
    }
    //! constructor that takes initialization arguments
-   MBuuid( MBuint l, MBushort w1, MBushort w2, 
-         MBuchar b1, MBuchar b2, MBuchar b3, 
-         MBuchar b4, MBuchar b5, MBuchar b6, 
-         MBuchar b7, MBuchar b8 )
+   MBuuid( unsigned l, unsigned short w1, unsigned short w2, 
+         unsigned char b1, unsigned char b2, unsigned char b3, 
+         unsigned char b4, unsigned char b5, unsigned char b6, 
+         unsigned char b7, unsigned char b8 )
    {
       data1 = l;
       data2 = w1;
@@ -74,13 +72,13 @@ struct MBuuid
    }
 
    //! uuid data storage
-   MBuint   data1;
-   MBushort data2;
-   MBushort data3;
-   MBuchar  data4[8];
+   unsigned   data1;
+   unsigned short data2;
+   unsigned short data3;
+   unsigned char  data4[8];
 };
   
-//! MBuuid for an unknown interface
+//! uuid for an unknown interface
 //! this can be used to either return a default interface
 //! or a NULL interface
 static const MBuuid IDD_MBUnknown = MBuuid( 0xf4f6605e, 0x2a7e, 0x4760, 
@@ -88,14 +86,15 @@ static const MBuuid IDD_MBUnknown = MBuuid( 0xf4f6605e, 0x2a7e, 0x4760,
 
 
 //! base class for all interface classes
-class MBUnknownInterface
+class UnknownInterface
 {
 public:
    virtual int QueryInterface
-      ( const MBuuid&, MBUnknownInterface** ) = 0;
-   virtual ~MBUnknownInterface() {};
+      ( const MBuuid&, UnknownInterface** ) = 0;
+   virtual ~UnknownInterface() {};
 };
 
+} // namespace moab 
 
-#endif  // MBUNKNOWNINTERFACE_HPP
+#endif  // MOAB_UNKNOWN_INTERFACE_HPP
 

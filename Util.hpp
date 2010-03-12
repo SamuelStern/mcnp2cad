@@ -14,14 +14,14 @@
  */
 
 //-------------------------------------------------------------------------
-// Filename      : MBUtil.hpp
+// Filename      : Util.hpp
 //
 // Purpose       : This file contains utility functions that can be used
 //                 with MB
 //
 // Special Notes : This is a pure virtual class, to prevent instantiation.
 //                 All functions are static, called like this:
-//                 MBUtil::function_name();
+//                 Util::function_name();
 //
 // Creator       : Ray J. Meyers
 //
@@ -34,9 +34,11 @@
 #ifndef MB_UTIL_HPP
 #define MB_UTIL_HPP
 
-#include "MBForward.hpp"
+#include "moab/Forward.hpp"
 
-struct  MBCoord
+namespace moab {
+
+struct  Coord
 {
   double x;
   double y;
@@ -45,22 +47,24 @@ struct  MBCoord
 
 
 //! utility function to be use throughout VERDE
-class MBUtil
+class Util
 {
 public:
 
    
-  static void normal(MBInterface* MB, MBEntityHandle handle, double& x, double& y, double& z);
+  static void normal(Interface* MB, EntityHandle handle, double& x, double& y, double& z);
 
-  static void centroid(MBInterface *MB, MBEntityHandle handle,MBCoord &coord);
- // static void edge_centers(MBInterface *MB, MBEntityHandle handle, std::vector<MBCoord> &coords_list);
+  static void centroid(Interface *MB, EntityHandle handle,Coord &coord);
+ // static void edge_centers(Interface *MB, EntityHandle handle, std::vector<Coord> &coords_list);
 
-  //static void face_centers(MBInterface *MB, MBEntityHandle handle, std::vector<MBCoord> &coords_list);
+  //static void face_centers(Interface *MB, EntityHandle handle, std::vector<Coord> &coords_list);
 
 private:
 
-  MBUtil(){};
+  Util(){};
 
 };
+
+} // namespace moab
 
 #endif

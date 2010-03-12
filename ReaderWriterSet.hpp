@@ -14,36 +14,38 @@
  */
 
 /**
- *\class MBReaderWriterSet
+ *\class ReaderWriterSet
  *\brief Maintain list of readers and writers.
  *\version 1.00
  *\date 2004-4-23
  *\author Jason Kraftcheck
  */
 
-#ifndef MB_READER_WRITER_SET_HPP
-#define MB_READER_WRITER_SET_HPP
+#ifndef MOAB_READER_WRITER_SET_HPP
+#define MOAB_READER_WRITER_SET_HPP
 
 #include <list>
 #include <string>
-#include "MBTypes.h"
+#include "moab/Types.hpp"
 
-class MBReaderIface;
-class MBWriterIface;
-class MBCore;
-class MBError;
+namespace moab {
 
-class MBReaderWriterSet
+class ReaderIface;
+class WriterIface;
+class Core;
+class Error;
+
+class ReaderWriterSet
 {
 
   public:
     
-    typedef MBReaderIface* (*reader_factory_t)( MBInterface* );
-    typedef MBWriterIface* (*writer_factory_t)( MBInterface* );
+    typedef ReaderIface* (*reader_factory_t)( Interface* );
+    typedef WriterIface* (*writer_factory_t)( Interface* );
   
-    MBReaderWriterSet( MBCore* mdb, MBError* handler );
+    ReaderWriterSet( Core* mdb, Error* handler );
   
-    ~MBReaderWriterSet();
+    ~ReaderWriterSet();
     
     /**
      * Regiseter a reader and/or writer
@@ -55,12 +57,12 @@ class MBReaderWriterSet
      *\param extensions   A null-terminated list of file extensions
      *\param name         File format identifier string.
      */
-    MBErrorCode register_factory( reader_factory_t reader_fact,
+    ErrorCode register_factory( reader_factory_t reader_fact,
                                   writer_factory_t writer_fact,
                                   const char* description,
                                   const char* const* extensions,
                                   const char* name );
-    MBErrorCode register_factory( reader_factory_t reader_fact,
+    ErrorCode register_factory( reader_factory_t reader_fact,
                                   writer_factory_t writer_fact,
                                   const char* description,
                                   const char* extension,
@@ -72,7 +74,7 @@ class MBReaderWriterSet
      * Caller must delete the object when finished.
      * Returns null if no matching file extension.
      */
-    MBReaderIface* get_file_extension_reader( const std::string& filename ) const;
+    ReaderIface* get_file_extension_reader( const std::string& filename ) const;
 
     /** 
      * Create a writer object for the passed file name 
@@ -80,21 +82,21 @@ class MBReaderWriterSet
      * Caller must delete the object when finished.
      * Returns null if no matching file extension.
      */
-    MBWriterIface* get_file_extension_writer( const std::string& filename ) const;
+    WriterIface* get_file_extension_writer( const std::string& filename ) const;
     
     /**
      * Create a reader object for the passed file format type.
      * Caller is responsible for deletion of returned object.
      * Returns NULL if no match.
      */
-    MBReaderIface* get_file_reader( const char* format_name ) const; 
+    ReaderIface* get_file_reader( const char* format_name ) const; 
      
     /**
      * Create a writer object for the passed file format type.
      * Caller is responsible for deletion of returned object.
      * Returns NULL if no match.
      */
-    MBWriterIface* get_file_writer( const char* format_name ) const; 
+    WriterIface* get_file_writer( const char* format_name ) const; 
     
     /** 
      * Get the file extension from a file name
@@ -103,7 +105,7 @@ class MBReaderWriterSet
   
     class Handler {
       
-      friend class MBReaderWriterSet;
+      friend class ReaderWriterSet;
       
       public:
       
@@ -122,10 +124,10 @@ class MBReaderWriterSet
       inline bool have_reader() const { return NULL != mReader; }
       inline bool have_writer() const { return NULL != mWriter; }
       
-      inline MBReaderIface* make_reader( MBInterface* iface ) const
+      inline ReaderIface* make_reader( Interface* iface ) const
         { return have_reader() ? mReader(iface) : NULL; }
       
-      inline MBWriterIface* make_writer( MBInterface* iface ) const
+      inline WriterIface* make_writer( Interface* iface ) const
         { return have_writer() ? mWriter(iface) : NULL; }
       
       bool operator==( const char* name ) const;
@@ -154,11 +156,12 @@ class MBReaderWriterSet
     
   private:
   
-    MBCore* mbCore;
-    MBError* mbError;
+    Core* mbCore;
+    Error* mbError;
   
     std::list<Handler> handlerList;
 };
 
+} // namespace moab 
 
 #endif

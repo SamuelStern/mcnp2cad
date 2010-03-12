@@ -13,11 +13,13 @@
  * 
  */
 
-#ifndef MB_TYPES_H
-#define MB_TYPES_H
+#ifndef MOAB_TYPES_HPP
+#define MOAB_TYPES_HPP
 
-#include "MBEntityType.h"
-#include "MBEntityHandle.h"
+#ifdef __cplusplus
+#include "moab/EntityType.hpp"
+#include "moab/EntityHandle.hpp"
+#endif
 
 /**\name Types and names
  * Types used in the MOAB interface
@@ -25,7 +27,7 @@
 /*@{*/
 
 #ifdef __cplusplus
-extern "C" {
+namespace moab {
 #endif
 
 #ifdef WIN32
@@ -39,7 +41,7 @@ extern "C" {
 #endif
 
 /** MOAB error codes */
-enum MBErrorCode { MB_SUCCESS = 0,
+enum ErrorCode { MB_SUCCESS = 0,
                    MB_INDEX_OUT_OF_RANGE,
                    MB_TYPE_OUT_OF_RANGE,
                    MB_MEMORY_ALLOCATION_FAILED,
@@ -57,12 +59,12 @@ enum MBErrorCode { MB_SUCCESS = 0,
                    MB_FAILURE};
 
 /** Misc. integer constants, declared in enum for portability */
-enum MBConstants {
+enum Constants {
   MB_VARIABLE_LENGTH = -1 /**< Length value for variable-length tags */ 
 };
 
 /** Specify storage type for tags.  See MOAB users guide for more information. */
-enum MBTagType {
+enum TagType {
   MB_TAG_BIT = 0, /**< size measured in bits instead of bytes, otherwise identical to sparse */
   MB_TAG_SPARSE,  /**< tags stored in (entity handle, tag value) pairs */
   MB_TAG_DENSE,   /**< tags stored in vectors directly on entity sequences, cheaper for tags which go on lots of entities */ 
@@ -70,12 +72,12 @@ enum MBTagType {
   MB_TAG_LAST=MB_TAG_MESH};
 
 /** Specify data type for tags. */
-enum MBDataType {
+enum DataType {
   MB_TYPE_OPAQUE  = 0, /**< byte array */
   MB_TYPE_INTEGER = 1, /**< native 'int' type */
   MB_TYPE_DOUBLE  = 2, /**< native 'double' type */
   MB_TYPE_BIT     = 3, /**< mandatory type for tags with MB_TAG_BIT storage */
-  MB_TYPE_HANDLE  = 4, /**< MBEntityHandle */
+  MB_TYPE_HANDLE  = 4, /**< EntityHandle */
   MB_MAX_DATA_TYPE = MB_TYPE_HANDLE
 };
 
@@ -83,19 +85,19 @@ enum MBDataType {
  *  use void** instead of a uint to prevent them from being confused as 
  *  entity handles.
  */
-typedef void** MBTag;
+typedef void** Tag;
 
 /** Meshset options: properties for meshset creation.
  *  Values are bit flags that may be combined with a bitwise OR (|)
  */
-enum MBEntitySetProperty {
+enum EntitySetProperty {
   MESHSET_TRACK_OWNER = 0x1, /**< create entity to meshset adjacencies */
   MESHSET_SET         = 0x2, /**< set contents are unique */
   MESHSET_ORDERED     = 0x4  /**< order of set contents is preserved */
 };
 
 #ifdef __cplusplus
-} /* extern "C" */
+} // namespace moab 
 #endif
 
 /*@}*/

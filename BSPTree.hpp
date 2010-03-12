@@ -13,51 +13,53 @@
  * 
  */
 
-/**\file MBAdaptiveKDTree.hpp
+/**\file AdaptiveKDTree.hpp
  *\author Jason Kraftcheck (kraftche@cae.wisc.edu)
  *\date 2008-05-12
  */
 
-#ifndef MB_BSP_TREE_HPP
-#define MB_BSP_TREE_HPP
+#ifndef MOAB_BSP_TREE_HPP
+#define MOAB_BSP_TREE_HPP
 
-#include "MBTypes.h"
-#include "MBInterface.hpp"
+#include "moab/Types.hpp"
+#include "moab/Interface.hpp"
 
 #include <math.h>
 #include <string>
 #include <vector>
 
-class MBBSPTreeBoxIter;
-class MBBSPTreeIter;
-class MBRange;
+namespace moab {
+
+class BSPTreeBoxIter;
+class BSPTreeIter;
+class Range;
 class BSPTreePoly;
 
-class MBBSPTree
+class BSPTree
 {
 private:
-  MBInterface* mbInstance;
-  MBTag planeTag, rootTag;
+  Interface* mbInstance;
+  Tag planeTag, rootTag;
   unsigned meshSetFlags;
   bool cleanUpTrees;
-  std::vector<MBEntityHandle> createdTrees;
+  std::vector<EntityHandle> createdTrees;
 
-  MBErrorCode init_tags( const char* tagname = 0 );
+  ErrorCode init_tags( const char* tagname = 0 );
 
 public:
   
   static double epsilon() { return 1e-6; }
 
-  MBBSPTree( MBInterface* iface,
+  BSPTree( Interface* iface,
              const char* tagname = 0,
              unsigned meshset_creation_flags = MESHSET_SET );
 
-  MBBSPTree( MBInterface* iface,
+  BSPTree( Interface* iface,
              bool destroy_created_trees,
              const char* tagname = 0,
              unsigned meshset_creation_flags = MESHSET_SET );
   
-  ~MBBSPTree();
+  ~BSPTree();
 
   //! Enumeriate split plane directions
   enum Axis { X = 0, Y = 1, Z = 2 };
@@ -125,82 +127,82 @@ public:
   };
   
   //! Get split plane for tree node
-  MBErrorCode get_split_plane( MBEntityHandle node, Plane& plane )
+  ErrorCode get_split_plane( EntityHandle node, Plane& plane )
     { return moab()->tag_get_data( planeTag, &node, 1, &plane ); }
   
   //! Set split plane for tree node
-  MBErrorCode set_split_plane( MBEntityHandle node, const Plane& plane );
+  ErrorCode set_split_plane( EntityHandle node, const Plane& plane );
   
   //! Get bounding box for entire tree
-  MBErrorCode get_tree_box( MBEntityHandle root_node,
+  ErrorCode get_tree_box( EntityHandle root_node,
                             double corner_coords[8][3] );
   
   //! Get bounding box for entire tree
-  MBErrorCode get_tree_box( MBEntityHandle root_node,
+  ErrorCode get_tree_box( EntityHandle root_node,
                             double corner_coords[24] );
   
   //! Set bounding box for entire tree
-  MBErrorCode set_tree_box( MBEntityHandle root_node,
+  ErrorCode set_tree_box( EntityHandle root_node,
                             const double box_min[3], 
                             const double box_max[3] );
-  MBErrorCode set_tree_box( MBEntityHandle root_node,
+  ErrorCode set_tree_box( EntityHandle root_node,
                             const double corner_coords[8][3] );
   
   //! Create tree root node
-  MBErrorCode create_tree( const double box_min[3],
+  ErrorCode create_tree( const double box_min[3],
                            const double box_max[3],
-                           MBEntityHandle& root_handle );
-  MBErrorCode create_tree( const double corner_coords[8][3],
-                           MBEntityHandle& root_handle );
+                           EntityHandle& root_handle );
+  ErrorCode create_tree( const double corner_coords[8][3],
+                           EntityHandle& root_handle );
   
   //! Create tree root node
-  MBErrorCode create_tree( MBEntityHandle& root_handle );
+  ErrorCode create_tree( EntityHandle& root_handle );
 
   //! Find all tree roots
-  MBErrorCode find_all_trees( MBRange& results );
+  ErrorCode find_all_trees( Range& results );
 
   //! Destroy a tree
-  MBErrorCode delete_tree( MBEntityHandle root_handle );
+  ErrorCode delete_tree( EntityHandle root_handle );
 
-  MBInterface* moab() { return mbInstance; }
+  Interface* moab() { return mbInstance; }
 
   //! Get iterator for tree
-  MBErrorCode get_tree_iterator( MBEntityHandle tree_root,
-                                 MBBSPTreeIter& result );
+  ErrorCode get_tree_iterator( EntityHandle tree_root,
+                                 BSPTreeIter& result );
   
   //! Get iterator at right-most ('last') leaf.
-  MBErrorCode get_tree_end_iterator( MBEntityHandle tree_root,
-                                     MBBSPTreeIter& result );
+  ErrorCode get_tree_end_iterator( EntityHandle tree_root,
+                                     BSPTreeIter& result );
 
   //! Split leaf of tree
   //! Updates iterator location to point to first new leaf node.
-  MBErrorCode split_leaf( MBBSPTreeIter& leaf, Plane plane );
+  ErrorCode split_leaf( BSPTreeIter& leaf, Plane plane );
 
   //! Split leaf of tree
   //! Updates iterator location to point to first new leaf node.
-  MBErrorCode split_leaf( MBBSPTreeIter& leaf, 
+  ErrorCode split_leaf( BSPTreeIter& leaf, 
                           Plane plane,
-                          MBEntityHandle& left_child,
-                          MBEntityHandle& right_child );
+                          EntityHandle& left_child,
+                          EntityHandle& right_child );
 
   //! Split leaf of tree
   //! Updates iterator location to point to first new leaf node.
-  MBErrorCode split_leaf( MBBSPTreeIter& leaf, 
+  ErrorCode split_leaf( BSPTreeIter& leaf, 
                           Plane plane,
-                          const MBRange& left_entities,
-                          const MBRange& right_entities );
+                          const Range& left_entities,
+                          const Range& right_entities );
 
   //! Split leaf of tree
   //! Updates iterator location to point to first new leaf node.
-  MBErrorCode split_leaf( MBBSPTreeIter& leaf, 
+  ErrorCode split_leaf( BSPTreeIter& leaf, 
                           Plane plane,
-                          const std::vector<MBEntityHandle>& left_entities,
-                          const std::vector<MBEntityHandle>& right_entities );
+                          const std::vector<EntityHandle>& left_entities,
+                          const std::vector<EntityHandle>& right_entities );
   
   //! Merge the leaf pointed to by the current iterator with it's
   //! sibling.  If the sibling is not a leaf, multiple merges may
   //! be done.
-  MBErrorCode merge_leaf( MBBSPTreeIter& iter );
+  ErrorCode merge_leaf( BSPTreeIter& iter );
 
   //! Get leaf contianing input position.
   //!
@@ -210,54 +212,54 @@ public:
   //!   caller can test against that box and not call this method
   //!   at all if the point is outside the box, as there is no leaf
   //!   containing the point in that case.
-  MBErrorCode leaf_containing_point( MBEntityHandle tree_root,
+  ErrorCode leaf_containing_point( EntityHandle tree_root,
                                      const double point[3],
-                                     MBEntityHandle& leaf_out );
+                                     EntityHandle& leaf_out );
 
   //! Get iterator at leaf containing input position.
   //! 
   //! Returns MB_ENTITY_NOT_FOUND if point is not within
   //! bounding box of tree.
-  MBErrorCode leaf_containing_point( MBEntityHandle tree_root,
+  ErrorCode leaf_containing_point( EntityHandle tree_root,
                                      const double xyz[3],
-                                     MBBSPTreeIter& result );
+                                     BSPTreeIter& result );
 };
 
-class MBBSPTreeIter
+class BSPTreeIter
 {
 public:
   
   enum Direction { LEFT = 0, RIGHT = 1 };
 
 private:
-  friend class MBBSPTree;
+  friend class BSPTree;
 
-  MBBSPTree* treeTool;
+  BSPTree* treeTool;
 
 protected:
-  std::vector<MBEntityHandle> mStack;
-  mutable std::vector<MBEntityHandle> childVect;
+  std::vector<EntityHandle> mStack;
+  mutable std::vector<EntityHandle> childVect;
 
-  virtual MBErrorCode step_to_first_leaf( Direction direction );
+  virtual ErrorCode step_to_first_leaf( Direction direction );
 
-  virtual MBErrorCode up();
-  virtual MBErrorCode down( const MBBSPTree::Plane& plane, Direction direction );
+  virtual ErrorCode up();
+  virtual ErrorCode down( const BSPTree::Plane& plane, Direction direction );
   
-  virtual MBErrorCode initialize( MBBSPTree* tool,
-                                  MBEntityHandle root,
+  virtual ErrorCode initialize( BSPTree* tool,
+                                  EntityHandle root,
                                   const double* point = 0 );
   
 public:
   
-  MBBSPTreeIter() : treeTool(0), childVect(2) {}
-  virtual ~MBBSPTreeIter() {}
+  BSPTreeIter() : treeTool(0), childVect(2) {}
+  virtual ~BSPTreeIter() {}
   
 
-  MBBSPTree* tool() const
+  BSPTree* tool() const
     { return treeTool; }
 
     //! Get handle for current leaf
-  MBEntityHandle handle() const
+  EntityHandle handle() const
     { return mStack.back(); }
     
     //! Get depth in tree. root is at depth of 1.
@@ -268,23 +270,23 @@ public:
   //! Note:  stepping past the end of the tree will invalidate
   //!        the iterator.  It will *not* be work step the
   //!        other direction.
-  virtual MBErrorCode step( Direction direction );
+  virtual ErrorCode step( Direction direction );
 
     //! Advance to next leaf
     //! Returns MB_ENTITY_NOT_FOUND if at end.
     //! Note: steping past the end of the tree will invalidate
     //!       the iterator. Calling back() will not work.
-  MBErrorCode step() { return step(RIGHT); }
+  ErrorCode step() { return step(RIGHT); }
 
     //! Move back to previous leaf
     //! Returns MB_ENTITY_NOT_FOUND if at beginning.
     //! Note: steping past the start of the tree will invalidate
     //!       the iterator. Calling step() will not work.
-  MBErrorCode back() { return step(LEFT); }
+  ErrorCode back() { return step(LEFT); }
   
   
     //! Get split plane that separates this node from its immediate sibling.
-  MBErrorCode get_parent_split_plane( MBBSPTree::Plane& plane ) const;
+  ErrorCode get_parent_split_plane( BSPTree::Plane& plane ) const;
   
     //! Get volume of leaf polyhedron
   virtual double volume() const;
@@ -310,11 +312,11 @@ public:
   
     //! Return true if thos node and the passed node share the
     //! same immediate parent.
-  bool is_sibling( const MBBSPTreeIter& other_leaf ) const;
+  bool is_sibling( const BSPTreeIter& other_leaf ) const;
   
     //! Return true if thos node and the passed node share the
     //! same immediate parent.
-  bool is_sibling( MBEntityHandle other_leaf ) const;
+  bool is_sibling( EntityHandle other_leaf ) const;
   
     //! Returns true if calling step() will advance to the
     //! immediate sibling of the current node.  Returns false
@@ -323,10 +325,10 @@ public:
   bool sibling_is_forward( ) const;
   
     //! Calculate the convex polyhedron bounding this leaf.
-  virtual MBErrorCode calculate_polyhedron( BSPTreePoly& polyhedron_out ) const;
+  virtual ErrorCode calculate_polyhedron( BSPTreePoly& polyhedron_out ) const;
 };
 
-class MBBSPTreeBoxIter : public MBBSPTreeIter
+class BSPTreeBoxIter : public BSPTreeIter
 {
   private:
     
@@ -336,13 +338,13 @@ class MBBSPTreeBoxIter : public MBBSPTreeIter
   
   protected:
 
-    virtual MBErrorCode step_to_first_leaf( Direction direction );
+    virtual ErrorCode step_to_first_leaf( Direction direction );
     
-    virtual MBErrorCode up();
-    virtual MBErrorCode down( const MBBSPTree::Plane& plane, Direction direction );
+    virtual ErrorCode up();
+    virtual ErrorCode down( const BSPTree::Plane& plane, Direction direction );
   
-    virtual MBErrorCode initialize( MBBSPTree* tool,
-                                    MBEntityHandle root,
+    virtual ErrorCode initialize( BSPTree* tool,
+                                    EntityHandle root,
                                     const double* point = 0 );
   public:
   
@@ -357,15 +359,15 @@ class MBBSPTreeBoxIter : public MBBSPTreeIter
                  };
   
   static SideBits side_above_plane( const double hex_coords[8][3],
-                                    const MBBSPTree::Plane& plane );
+                                    const BSPTree::Plane& plane );
   
   static SideBits side_on_plane( const double hex_coords[8][3],
-                                 const MBBSPTree::Plane& plane );
+                                 const BSPTree::Plane& plane );
   
   static SideBits opposite_face( const SideBits& bits ) 
     { return (SideBits)((~bits) & 0xFF); }
   
-  static MBErrorCode face_corners( const SideBits face, 
+  static ErrorCode face_corners( const SideBits face, 
                                    const double hex_corners[8][3],
                                    double face_corners_out[4][3] );
   
@@ -373,32 +375,32 @@ class MBBSPTreeBoxIter : public MBBSPTreeIter
   //! Note:  stepping past the end of the tree will invalidate
   //!        the iterator.  It will *not* work to subsequently 
   //!        step the other direction.
-  virtual MBErrorCode step( Direction direction );
+  virtual ErrorCode step( Direction direction );
 
     //! Advance to next leaf
     //! Returns MB_ENTITY_NOT_FOUND if at end.
     //! Note: steping past the end of the tree will invalidate
     //!       the iterator. Calling back() will not work.
-  MBErrorCode step() { return MBBSPTreeIter::step(); }
+  ErrorCode step() { return BSPTreeIter::step(); }
 
     //! Move back to previous leaf
     //! Returns MB_ENTITY_NOT_FOUND if at beginning.
     //! Note: steping past the start of the tree will invalidate
     //!       the iterator. Calling step() will not work.
-  MBErrorCode back() { return MBBSPTreeIter::back(); }
+  ErrorCode back() { return BSPTreeIter::back(); }
   
     //! Get coordinates of box corners, in Exodus II hexahedral ordering.
-  MBErrorCode get_box_corners( double coords[8][3] ) const;
+  ErrorCode get_box_corners( double coords[8][3] ) const;
   
     //! Get volume of leaf box
   double volume() const;
   
     //! test if a plane intersects the leaf box
   enum XSect { MISS = 0, SPLIT = 1, NONHEX = -1 };
-  XSect splits( const MBBSPTree::Plane& plane ) const;
+  XSect splits( const BSPTree::Plane& plane ) const;
   
     //! test if a plane intersects the leaf box
-  bool intersects( const MBBSPTree::Plane& plane ) const;
+  bool intersects( const BSPTree::Plane& plane ) const;
   
     //! Find range of overlap between ray and leaf.
     //!
@@ -427,7 +429,7 @@ class MBBSPTreeBoxIter : public MBBSPTreeIter
     //!\return MB_ENTITY_NOT FOUND if root node.
     //!        MB_FAILURE if internal error.
     //!        MB_SUCCESS otherwise.
-  MBErrorCode sibling_side( SideBits& side_out ) const;
+  ErrorCode sibling_side( SideBits& side_out ) const;
   
     //! Get adjacent leaf nodes on indicated side
     //!
@@ -442,12 +444,14 @@ class MBBSPTreeBoxIter : public MBBSPTreeIter
     //!              this value can be used to control whether or not
     //!              leaves adjacent at only their edges or corners are
     //!              returned.
-  MBErrorCode get_neighbors( SideBits side,
-                             std::vector<MBBSPTreeBoxIter>& results,
+  ErrorCode get_neighbors( SideBits side,
+                             std::vector<BSPTreeBoxIter>& results,
                              double epsilon = 0.0 ) const;
   
     //! Calculate the convex polyhedron bounding this leaf.
-  MBErrorCode calculate_polyhedron( BSPTreePoly& polyhedron_out ) const;
+  ErrorCode calculate_polyhedron( BSPTreePoly& polyhedron_out ) const;
 };
+
+} // namespace moab 
 
 #endif

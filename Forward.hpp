@@ -13,16 +13,20 @@
  * 
  */
 
-#ifndef MB_FORWARD_HPP
-#define MB_FORWARD_HPP
+#ifndef MOAB_FORWARD_HPP
+#define MOAB_FORWARD_HPP
 
-#include "MBTypes.h"
+#include "moab/Types.hpp"
 #include <vector>
 
-class MBInterface;
-class MBRange;
-class MBProcConfig;
+namespace moab {
 
-typedef std::vector<MBEntityHandle> MBHandleVec;
+class Interface;
+class Range;
+class ProcConfig;
+
+typedef std::vector<EntityHandle> HandleVec;
+
+} // namespace moab
 
 #endif

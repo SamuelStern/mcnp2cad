@@ -14,7 +14,7 @@
  */
 
 /**
- * \class MBRange
+ * \class Range
  *
  * Stores contiguous or partially contiguous values in an optimized
  * fashion.  Partially contiguous accessing patterns is also optimized.
@@ -27,14 +27,14 @@
 
 
 /*
- *************  MBRange FAQ and tips ********************
+ *************  Range FAQ and tips ********************
 
  The purpose of this FAQ is to familiarize a user with
- the appropriate use of the MBRange template.
+ the appropriate use of the Range template.
 
-   ******* A few points about MBRange: *******
- 1.  MBRange is not the be all of generic containers.
- 2.  MBRange has its strengths and weakneses as any other
+   ******* A few points about Range: *******
+ 1.  Range is not the be all of generic containers.
+ 2.  Range has its strengths and weakneses as any other
      STL container has.
  3.  Strengths:
      a. For contiguous values, storage is extremely minimal.
@@ -52,15 +52,15 @@
         time operation.
      c. Insertions of random data is VERY slow.
 
-   Given the above characteristics of MBRanges, you can now
-   decide between MBRange and another STL container for your
+   Given the above characteristics of Ranges, you can now
+   decide between Range and another STL container for your
    particular needs.
 
 
    ******* Tips *******
  1.  Be aware of what iterators are available.  Currently, there are
-     three.  MBRange<T>::iterator, MBRange<T>::const_iterator,
-     and MBRange<T>::RangeListIterator.
+     three.  Range<T>::iterator, Range<T>::const_iterator,
+     and Range<T>::RangeListIterator.
      iterator is derived from const_iterator.  const_iterator
      is derived from RangeListIterator.  RangeListIterator is a
      std::list<std::pair<T,T> >::const_iterator.
@@ -69,15 +69,15 @@
 
      ie.
      
-     MBRange<char> range1;
+     Range<char> range1;
      ... put some stuff in range1
-     MBRange<char> range2;
+     Range<char> range2;
      
      // the SLOW way.
-     std::copy(range1.begin(), range1.end(), mb_range_inserter<...>(range2));
+     std::copy(range1.begin(), range1.end(), range_inserter<...>(range2));
 
      // the FAST way.
-     for(MBRange<char>::RangeListIterator iter = range1.begin(),
+     for(Range<char>::RangeListIterator iter = range1.begin(),
          iter != range1.end(); ++iter)
      {
        range2.insert(iter->first, iter->second);
@@ -92,13 +92,13 @@
 
      ie.
      std::set<int> my_set;
-     MBRange<int> my_range;
+     Range<int> my_range;
      .. perform some operations which set does efficiently.
 
      // now copy the results from the set into the range.
      // copy from the end of the set to the beginning of the set
      std::copy(my_set.rbegin(), my_set.rend(), 
-         mb_range_inserter< MBRange<int> > ( my_range );
+         range_inserter< Range<int> > ( my_range );
 
  4.  Use empty() instead of size() if you only need to find out
      if there is anything in the list.
@@ -107,12 +107,12 @@
      the contents of one list with another.
 
      void compute_and_get_some_set( 
-         MBRange<char> range1, 
-         MBRange<char> range2,
-         MBRange<char>& results
+         Range<char> range1, 
+         Range<char> range2,
+         Range<char>& results
          );
      {
-       MBRange<char> tmp_results;
+       Range<char> tmp_results;
        .. perform some computation on range1 and range2
           and put results in tmp_results;
        .. filter tmp_results out for some special type.
@@ -128,24 +128,24 @@
     class SomeClass
     {
     public:
-      MBRange<int> range;
+      Range<int> range;
     };
     ....
     void some_function( const SomeClass& some_class )
     {
-      MBRange<int>::iterator = some_class.range.begin();
+      Range<int>::iterator = some_class.range.begin();
     }
     ---------------------
     Solution:  you need to use
-    MBRange<int>::const_iterator instead.
+    Range<int>::const_iterator instead.
 
  2. Why doesn't this work right when I try to change the
-    contents of an MBRange?
+    contents of an Range?
 
     // make a range that has the letters A,B,C in it.
-    MBRange<char> my_chars('A', 'C');
+    Range<char> my_chars('A', 'C');
     // make an iterator that points to 'A'.
-    MBRange<char>::iterator iter = my_chars.begin();
+    Range<char>::iterator iter = my_chars.begin();
     // change A to D
     *iter = 'D';
     // print contents of my_chars to stdout
@@ -158,8 +158,8 @@
       B C D
 
     When one calls *iter, which returns 'A', the actual storage of the value 'A' 
-    which is returned is in the iterator and not in the MBRange.  This allows
-    for multiple iterators on a single MBRange and the MBRange does not have
+    which is returned is in the iterator and not in the Range.  This allows
+    for multiple iterators on a single Range and the Range does not have
     to keep track of which iterator is referencing which value.
 
 
@@ -167,27 +167,29 @@
 */
 
 
-#ifndef MB_RANGE_HPP
-#define MB_RANGE_HPP
+#ifndef MOAB_RANGE_HPP
+#define MOAB_RANGE_HPP
 
 #include <iterator>
 #include <iosfwd>
-#include "MBTypes.h"
+#include "moab/Types.hpp"
+
+namespace moab {
 
 struct range_iter_tag : public std::bidirectional_iterator_tag {};
 
 struct range_base_iter
 {
   typedef range_iter_tag iterator_category;
-  typedef MBEntityID difference_type;
-  typedef MBEntityHandle value_type;
-  typedef MBEntityHandle* pointer;
-  typedef MBEntityHandle& reference;
+  typedef EntityID difference_type;
+  typedef EntityHandle value_type;
+  typedef EntityHandle* pointer;
+  typedef EntityHandle& reference;
 };
 
 
-//! the class MBRange
-class MBRange
+//! the class Range
+class Range
 {
 public:
 
@@ -197,27 +199,27 @@ public:
   typedef const_iterator iterator;
   typedef const_reverse_iterator reverse_iterator;
  
-  friend MBRange intersect( const MBRange&, const MBRange& );
-  friend MBRange subtract( const MBRange&, const MBRange& );
+  friend Range intersect( const Range&, const Range& );
+  friend Range subtract( const Range&, const Range& );
 
   //! for short hand notation, lets typedef the 
   //! container class that holds the ranges
-  typedef MBEntityHandle value_type;
+  typedef EntityHandle value_type;
 
   //! default constructor
-  MBRange();
+  Range();
 
     //! copy constructor
-  MBRange(const MBRange& copy);
+  Range(const Range& copy);
 
   //! another constructor that takes an initial range
-  MBRange( MBEntityHandle val1, MBEntityHandle val2 );
+  Range( EntityHandle val1, EntityHandle val2 );
 
     //! operator=
-  MBRange& operator=(const MBRange& copy);
+  Range& operator=(const Range& copy);
   
   //! destructor
-  ~MBRange();
+  ~Range();
 
   //! return the beginning const iterator of this range
   inline const_iterator begin() const;
@@ -232,28 +234,28 @@ public:
   inline const_reverse_iterator rend() const;
 
   //! return the number of values this Ranges represents
-  MBEntityHandle size() const;
+  EntityHandle size() const;
 
   //! return the number of range pairs in the list
-  MBEntityHandle psize() const;
+  EntityHandle psize() const;
   
   //! return whether empty or not 
   //! always use "if(!Ranges::empty())" instead of "if(Ranges::size())"
   inline bool empty() const;
 
-  iterator insert( iterator hint, MBEntityHandle val );
+  iterator insert( iterator hint, EntityHandle val );
 
   //! insert an item into the list and return the iterator for the inserted item
-  iterator insert(MBEntityHandle val)
+  iterator insert(EntityHandle val)
     { return insert( begin(), val ); }
   
   //! insert a range of items into this list and return the iterator for the first
   //! inserted item
-  iterator insert( iterator hint, MBEntityHandle first, MBEntityHandle last );
+  iterator insert( iterator hint, EntityHandle first, EntityHandle last );
   
   //! insert a range of items into this list and return the iterator for the first
   //! inserted item
-  iterator insert(MBEntityHandle val1, MBEntityHandle val2)
+  iterator insert(EntityHandle val1, EntityHandle val2)
     { return insert( begin(), val1, val2 ); }
   
     //! remove an item from this list and return an iterator to the next item
@@ -263,46 +265,46 @@ public:
   iterator erase( iterator iter1, iterator iter2);
 
   //! erases a value from this container
-  inline iterator erase(MBEntityHandle val);
+  inline iterator erase(EntityHandle val);
   
   //! get first entity in range
-  inline const MBEntityHandle& front() const;
+  inline const EntityHandle& front() const;
   //! get last entity in range
-  inline const MBEntityHandle& back() const;
+  inline const EntityHandle& back() const;
   //! remove first entity from range
-  MBEntityHandle pop_front();
+  EntityHandle pop_front();
   //! remove last entity from range
-  MBEntityHandle pop_back();
+  EntityHandle pop_back();
   
   //! find an item int the list and return an iterator at that value
-  const_iterator find(MBEntityHandle val) const;
+  const_iterator find(EntityHandle val) const;
 
   //! return an iterator to the first value >= val
   static const_iterator lower_bound(const_iterator first,
                                     const_iterator last,
-                                    MBEntityHandle val);
+                                    EntityHandle val);
   static const_iterator upper_bound(const_iterator first,
                                     const_iterator last,
-                                    MBEntityHandle val);
+                                    EntityHandle val);
   
-  const_iterator lower_bound( MBEntityHandle val ) const 
+  const_iterator lower_bound( EntityHandle val ) const 
     { return lower_bound( begin(), end(), val ); }
-  const_iterator upperbound( MBEntityHandle val ) const 
+  const_iterator upperbound( EntityHandle val ) const 
     { return upper_bound( begin(), end(), val ); }
-  const_iterator lower_bound( MBEntityType type ) const;
-  const_iterator upper_bound( MBEntityType type ) const;
-  std::pair<const_iterator, const_iterator> equal_range( MBEntityType type ) const;
-  const_iterator lower_bound( MBEntityType type, const_iterator first ) const;
-  const_iterator upper_bound( MBEntityType type, const_iterator first ) const;
+  const_iterator lower_bound( EntityType type ) const;
+  const_iterator upper_bound( EntityType type ) const;
+  std::pair<const_iterator, const_iterator> equal_range( EntityType type ) const;
+  const_iterator lower_bound( EntityType type, const_iterator first ) const;
+  const_iterator upper_bound( EntityType type, const_iterator first ) const;
   
   //! True if all entities in range are of passed type 
   //! (also true if range is empty)
-  bool all_of_type( MBEntityType type ) const;
+  bool all_of_type( EntityType type ) const;
   //! True if all entities in range are of passed dimension 
   //! (also true if range is empty)
   bool all_of_dimension( int dimension ) const;
   
-  unsigned num_of_type( MBEntityType type ) const;
+  unsigned num_of_type( EntityType type ) const;
   unsigned num_of_dimension( int dim ) const;
   
   //! clears the contents of the list 
@@ -314,38 +316,38 @@ public:
   
   unsigned long get_memory_use() const;
 
-  //! merges this MBRange with another range
-  void merge( const MBRange& range );
+  //! merges this Range with another range
+  void merge( const Range& range );
   
   //! merge a subset of some other range
-  void merge( MBRange::const_iterator begin,
-              MBRange::const_iterator end );
+  void merge( Range::const_iterator begin,
+              Range::const_iterator end );
 
   //! swap the contents of this range with another one
-  void swap( MBRange &range );
+  void swap( Range &range );
 
     //! check for internal consistency
   void sanity_check() const;
 
     //! return a subset of this range, by type
-  MBRange subset_by_type(MBEntityType t) const;
+  Range subset_by_type(EntityType t) const;
   
-  struct PairNode : public std::pair<MBEntityHandle,MBEntityHandle>
+  struct PairNode : public std::pair<EntityHandle,EntityHandle>
   {
 
-    PairNode() : std::pair<MBEntityHandle,MBEntityHandle>(0, 0), mNext(NULL), mPrev(NULL) {}
+    PairNode() : std::pair<EntityHandle,EntityHandle>(0, 0), mNext(NULL), mPrev(NULL) {}
     PairNode(PairNode* next, PairNode* prev, 
-             MBEntityHandle _first, MBEntityHandle _second)
-      : std::pair<MBEntityHandle,MBEntityHandle>(_first,_second), mNext(next), mPrev(prev) {}
+             EntityHandle _first, EntityHandle _second)
+      : std::pair<EntityHandle,EntityHandle>(_first,_second), mNext(next), mPrev(prev) {}
 
     PairNode* mNext;
     PairNode* mPrev;
   };
 
   
-  MBEntityHandle operator[](MBEntityID index) const;
+  EntityHandle operator[](EntityID index) const;
 
-  int index(MBEntityHandle handle) const;
+  int index(EntityHandle handle) const;
   
 protected:
 
@@ -361,7 +363,7 @@ public:
     //! used to iterate over sub-ranges of a range
   class pair_iterator : public range_base_iter
   {
-    friend class MBRange;
+    friend class Range;
   public:
     pair_iterator() : mNode(NULL) {}
     pair_iterator(PairNode *node) : mNode(node) {}
@@ -370,7 +372,7 @@ public:
     pair_iterator(const const_iterator& copy)
       : mNode(copy.mNode) {}
 
-    std::pair<MBEntityHandle,MBEntityHandle>* operator->() { return mNode; }
+    std::pair<EntityHandle,EntityHandle>* operator->() { return mNode; }
     
     pair_iterator& operator++()
     {
@@ -414,24 +416,24 @@ public:
 
   class const_pair_iterator;
 
-  //! a const iterator which iterates over an MBRange
+  //! a const iterator which iterates over an Range
   class const_iterator : public range_base_iter
   {
-    friend class MBRange;
+    friend class Range;
     friend class pair_iterator;
     friend class const_pair_iterator;
-    friend MBEntityID operator-( const const_iterator&, const const_iterator& );
+    friend EntityID operator-( const const_iterator&, const const_iterator& );
   public:
     //! default constructor - intialize base default constructor
     const_iterator() : mNode(NULL), mValue(0) {}
 
-    //! constructor used by MBRange
-    const_iterator( const PairNode* iter, const MBEntityHandle val) 
+    //! constructor used by Range
+    const_iterator( const PairNode* iter, const EntityHandle val) 
       : mNode(const_cast<PairNode*>(iter)), mValue(val)  {} 
 
     //! dereference that value this iterator points to
     //! returns a const reference
-    const MBEntityHandle& operator*() const { return  mValue; }
+    const EntityHandle& operator*() const { return  mValue; }
 
     //! prefix incrementer
     const_iterator& operator++()
@@ -488,12 +490,12 @@ public:
     //! Advance iterator specified amount.
     //! Potentially O(n), but typically better.  Always
     //! more efficient than calling operator++ step times.
-    const_iterator& operator+=( MBEntityID step );
+    const_iterator& operator+=( EntityID step );
     
     //! Regress iterator specified amount.
     //! Potentially O(n), but typically better.  Always
     //! more efficient than calling operator-- step times.
-    const_iterator& operator-=( MBEntityID step );
+    const_iterator& operator-=( EntityID step );
 
     //! equals operator
     bool operator==( const const_iterator& other ) const
@@ -530,13 +532,13 @@ public:
     //! the node we are pointing at
     PairNode* mNode;
     //! the value in the range
-    MBEntityHandle mValue;
+    EntityHandle mValue;
   };
 
-  //! a const reverse iterator which iterates over an MBRange
+  //! a const reverse iterator which iterates over an Range
   class const_reverse_iterator : public range_base_iter
   {
-    friend class MBRange;
+    friend class Range;
     friend class pair_iterator;
   public:
     //! default constructor - intialize base default constructor
@@ -544,13 +546,13 @@ public:
     
     const_reverse_iterator( const_iterator fwd_iter ) : myIter(fwd_iter) {}
 
-    //! constructor used by MBRange
-    const_reverse_iterator( const PairNode* iter, const MBEntityHandle val) 
+    //! constructor used by Range
+    const_reverse_iterator( const PairNode* iter, const EntityHandle val) 
       : myIter(iter, val)  {} 
 
     //! dereference that value this iterator points to
     //! returns a const reference
-    const MBEntityHandle& operator*() const { return  *myIter; }
+    const EntityHandle& operator*() const { return  *myIter; }
 
     //! prefix incrementer
     const_reverse_iterator& operator++()
@@ -581,7 +583,7 @@ public:
     //! Advance iterator specified amount.
     //! Potentially O(n), but typically better.  Always
     //! more efficient than calling operator++ step times.
-    const_reverse_iterator& operator+=( MBEntityID step )
+    const_reverse_iterator& operator+=( EntityID step )
     {
       myIter -= step;
       return *this;
@@ -590,7 +592,7 @@ public:
     //! Regress iterator specified amount.
     //! Potentially O(n), but typically better.  Always
     //! more efficient than calling operator-- step times.
-    const_reverse_iterator& operator-=( MBEntityID step )
+    const_reverse_iterator& operator-=( EntityID step )
     {
       myIter += step;
       return *this;
@@ -622,10 +624,10 @@ public:
       const_pair_iterator( const PairNode* node ) : myNode(node) {}
       const_pair_iterator( const const_iterator& i ) : myNode(i.mNode) {}
       
-      const std::pair<MBEntityHandle, MBEntityHandle>& operator*() const
+      const std::pair<EntityHandle, EntityHandle>& operator*() const
         { return *myNode; }
       
-      const std::pair<MBEntityHandle, MBEntityHandle>* operator->() const
+      const std::pair<EntityHandle, EntityHandle>* operator->() const
         { return myNode; }
       
       const_pair_iterator& operator--()
@@ -661,69 +663,69 @@ public:
 
  
     //! intersect two ranges, placing the results in the return range
-MBRange intersect( const MBRange&, const MBRange& );
+Range intersect( const Range&, const Range& );
 
     //! subtract range2 from this, placing the results in the return range
-MBRange subtract( const MBRange& from, const MBRange& );
+Range subtract( const Range& from, const Range& );
 
     //! unite two ranges, placing the results in the return range
-inline MBRange unite( const MBRange& r1, const MBRange& r2 )
-  { MBRange r(r1); r.merge(r2); return r; }
+inline Range unite( const Range& r1, const Range& r2 )
+  { Range r(r1); r.merge(r2); return r; }
 
 
-inline MBRange::const_iterator 
-operator+( const MBRange::const_iterator& it, MBEntityID step )
-  { MBRange::const_iterator tmp(it); return tmp += step; }
+inline Range::const_iterator 
+operator+( const Range::const_iterator& it, EntityID step )
+  { Range::const_iterator tmp(it); return tmp += step; }
   
-inline MBRange::const_iterator 
-operator+( MBEntityID step, const MBRange::const_iterator& it )
-  { MBRange::const_iterator tmp(it); return tmp += step; }
+inline Range::const_iterator 
+operator+( EntityID step, const Range::const_iterator& it )
+  { Range::const_iterator tmp(it); return tmp += step; }
   
-inline MBRange::const_iterator 
-operator-( const MBRange::const_iterator& it, MBEntityID step )
-  { MBRange::const_iterator tmp(it); return tmp -= step; }
+inline Range::const_iterator 
+operator-( const Range::const_iterator& it, EntityID step )
+  { Range::const_iterator tmp(it); return tmp -= step; }
   
-inline MBRange::const_iterator 
-operator-( MBEntityID step, const MBRange::const_iterator& it )
-  { MBRange::const_iterator tmp(it); return tmp -= step; }
+inline Range::const_iterator 
+operator-( EntityID step, const Range::const_iterator& it )
+  { Range::const_iterator tmp(it); return tmp -= step; }
   
-MBEntityID 
-operator-(  const MBRange::const_iterator& it1, const MBRange::const_iterator& it2 );
+EntityID 
+operator-(  const Range::const_iterator& it1, const Range::const_iterator& it2 );
 
 //! Use as you would an STL back_inserter
 /**
- *  e.g. std::copy(list.begin(), list.end(), mb_range_inserter(my_range);
+ *  e.g. std::copy(list.begin(), list.end(), range_inserter(my_range);
  * Also, see comments/instructions at the top of this class declaration
  */
-class mb_range_inserter 
+class range_inserter 
 {
   
 protected:
-  MBRange* container;
+  Range* container;
  
 public:
   //constructor
-  explicit mb_range_inserter(MBRange& x) : container(&x) {}
-  mb_range_inserter&
-  operator=(const MBRange::value_type& value) 
+  explicit range_inserter(Range& x) : container(&x) {}
+  range_inserter&
+  operator=(const Range::value_type& value) 
   {
     container->insert(value);
     return *this;
   }
 
-  mb_range_inserter& operator*() { return *this; }
-  mb_range_inserter& operator++() { return *this; }
-  mb_range_inserter& operator++(int) { return *this; }
+  range_inserter& operator*() { return *this; }
+  range_inserter& operator++() { return *this; }
+  range_inserter& operator++(int) { return *this; }
 
-  typedef MBEntityHandle            value_type;
-  typedef MBEntityID                difference_type;
+  typedef EntityHandle            value_type;
+  typedef EntityID                difference_type;
   typedef std::output_iterator_tag  iterator_category;
-  typedef MBEntityHandle*           pointer;
-  typedef MBEntityHandle&           reference;
+  typedef EntityHandle*           pointer;
+  typedef EntityHandle&           reference;
 };
 
 
-inline MBRange::MBRange()
+inline Range::Range()
 {
     // set the head node to point to itself
   mHead.mNext = mHead.mPrev = &mHead;
@@ -731,73 +733,75 @@ inline MBRange::MBRange()
 }
   
   //! destructor
-inline MBRange::~MBRange()
+inline Range::~Range()
 {
   clear();
 }
 
   //! return the beginning const iterator of this range
-inline MBRange::const_iterator MBRange::begin() const
+inline Range::const_iterator Range::begin() const
 {
   return const_iterator(mHead.mNext, mHead.mNext->first);
 }
   
   //! return the beginning const reverse iterator of this range
-inline MBRange::const_reverse_iterator MBRange::rbegin() const
+inline Range::const_reverse_iterator Range::rbegin() const
 {
   return const_reverse_iterator(mHead.mPrev, mHead.mPrev->second);
 }
  
   //! return the ending const iterator for this range
-inline MBRange::const_iterator MBRange::end() const
+inline Range::const_iterator Range::end() const
 {
   return const_iterator(&mHead, mHead.first);
 }
   
   //! return the ending const reverse iterator for this range
-inline MBRange::const_reverse_iterator MBRange::rend() const
+inline Range::const_reverse_iterator Range::rend() const
 {
   return const_reverse_iterator(&mHead, mHead.second);
 }
 
   //! return whether empty or not 
   //! always use "if(!Ranges::empty())" instead of "if(Ranges::size())"
-inline bool MBRange::empty() const
+inline bool Range::empty() const
 {
   return (mHead.mNext == &mHead);
 }
 
   //! erases a value from this container
-inline MBRange::iterator MBRange::erase(MBEntityHandle val) 
+inline Range::iterator Range::erase(EntityHandle val) 
 { 
   return erase(find(val)); 
 }
   
-inline MBRange::const_iterator MBRange::const_iterator::end_of_block() const
-  { return MBRange::const_iterator( mNode, mNode->second ); }
+inline Range::const_iterator Range::const_iterator::end_of_block() const
+  { return Range::const_iterator( mNode, mNode->second ); }
 
   //! get first entity in range
-inline const MBEntityHandle& MBRange::front() const
+inline const EntityHandle& Range::front() const
   { return mHead.mNext->first; }
   //! get last entity in range
-inline const MBEntityHandle& MBRange::back() const
+inline const EntityHandle& Range::back() const
   { return mHead.mPrev->second; }
 
-inline std::ostream& operator<<( std::ostream& s, const MBRange& r )
+inline std::ostream& operator<<( std::ostream& s, const Range& r )
   { r.print(s); return s; }
   
-bool operator==( const MBRange& r1, const MBRange& r2 );
-inline bool operator!=( const MBRange& r1, const MBRange& r2 )
+bool operator==( const Range& r1, const Range& r2 );
+inline bool operator!=( const Range& r1, const Range& r2 )
   { return !(r1 == r2); }
 
-inline MBEntityHandle MBRange::operator[](MBEntityID index) const
+inline EntityHandle Range::operator[](EntityID index) const
 {
-  MBRange::const_iterator i = begin();
+  Range::const_iterator i = begin();
   i += index;
   return *i;
 }
 
-#endif // MB_RANGE_HPP
+} // namespace moab 
+
+#endif // MOAB_RANGE_HPP
 
 
 

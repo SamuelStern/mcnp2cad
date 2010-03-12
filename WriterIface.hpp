@@ -14,27 +14,29 @@
  */
 
 /**
- *\class MBWriterIface
+ *\class WriterIface
  *\brief Interface for mesh writer implementations.
  *\version 1.00
  *\date 2004-4-23
  *\author Jason Kraftcheck
  */
 
-#ifndef MB_WRITER_IFACE_HPP
-#define MB_WRITER_IFACE_HPP
+#ifndef MOAB_WRITER_IFACE_HPP
+#define MOAB_WRITER_IFACE_HPP
 
 #include <vector>
 #include <string>
-#include "MBTypes.h"
+#include "moab/Types.hpp"
+
+namespace moab {
 
 class FileOptions;
 
-class MBWriterIface
+class WriterIface
 {
   public:
   
-    virtual ~MBWriterIface() {}
+    virtual ~WriterIface() {}
     
     /**
      *\brief Export mesh to a file.
@@ -55,21 +57,22 @@ class MBWriterIface
      *\param requseted_output_dimension  The geometric dimension of the
      *                      output mesh (coord values per vertex.)  If
      *                      zero, the dimension of the mesh as returned
-     *                      from MBInterface should be used.
+     *                      from Interface should be used.
      *\author Jason Kraftcheck
      */
-    virtual MBErrorCode write_file( const char* file_name,
+    virtual ErrorCode write_file( const char* file_name,
                                     const bool overwrite,
                                     const FileOptions& opts,
-                                    const MBEntityHandle* meshset_list,
+                                    const EntityHandle* meshset_list,
                                     const int num_sets,
                                     const std::vector<std::string>& qa_records,
-                                    const MBTag* tag_list,
+                                    const Tag* tag_list,
                                     int num_tags,
                                     int requested_output_dimension = 0 ) = 0;
 };
 
+} // namespace moab 
+
 #endif
 
-    
     

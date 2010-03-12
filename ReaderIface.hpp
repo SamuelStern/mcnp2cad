@@ -14,25 +14,27 @@
  */
 
 /**
- *\class MBReaderIface
+ *\class ReaderIface
  *\brief Interface for mesh reader implementations.
  *\version 1.00
  *\date 2004-4-23
  *\author Jason Kraftcheck
  */
 
-#ifndef MB_READER_IFACE_HPP
-#define MB_READER_IFACE_HPP
+#ifndef MOAB_READER_IFACE_HPP
+#define MOAB_READER_IFACE_HPP
 
-#include "MBTypes.h"
+#include "moab/Types.hpp"
+
+namespace moab {
 
 class FileOptions;
 
-class MBReaderIface
+class ReaderIface
 {
   public:
   
-    virtual ~MBReaderIface() {}
+    virtual ~ReaderIface() {}
     
       /** Struct used to specify subset of file to read */
     struct IDTag {
@@ -62,12 +64,12 @@ class MBReaderIface
      *                      it reads, a unique integer ID for this tag.
      *\author Jason Kraftcheck
      */
-    virtual MBErrorCode load_file( const char* file_name,
-                                   const MBEntityHandle* file_set,
+    virtual ErrorCode load_file( const char* file_name,
+                                   const EntityHandle* file_set,
                                    const FileOptions& opts,
                                    const IDTag* subset_list = 0,
                                    int subset_list_length = 0,
-                                   const MBTag* file_id_tag = 0 ) = 0;
+                                   const Tag* file_id_tag = 0 ) = 0;
 
 
     /**
@@ -85,13 +87,15 @@ class MBReaderIface
      *                      tags (intersection) should be read.
      *\param subset_list_length The length of the 'subset_list' array.
      */
-    virtual MBErrorCode read_tag_values( const char* file_name,
+    virtual ErrorCode read_tag_values( const char* file_name,
                                          const char* tag_name,
                                          const FileOptions& opts,
                                          std::vector<int>& tag_values_out,
                                          const IDTag* subset_list = 0,
                                          int subset_list_length = 0 ) = 0;
 };
+
+} // namespace moab 
 
 #endif
 

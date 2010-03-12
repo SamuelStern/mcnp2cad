@@ -13,46 +13,48 @@
  * 
  */
 
-/**\file MBAdaptiveKDTree.hpp
+/**\file AdaptiveKDTree.hpp
  *\author Jason Kraftcheck (kraftche@cae.wisc.edu)
  *\date 2007-04-1
  */
 
-#ifndef MB_ADAPTIVE_KD_TREE_HPP
-#define MB_ADAPTIVE_KD_TREE_HPP
+#ifndef MOAB_ADAPTIVE_KD_TREE_HPP
+#define MOAB_ADAPTIVE_KD_TREE_HPP
 
-#include "MBTypes.h"
+#include "moab/Types.hpp"
 
 #include <string>
 #include <vector>
 #include <math.h>
 
-class MBAdaptiveKDTreeIter;
-class MBInterface;
-class MBRange;
+namespace moab {
 
-class MBAdaptiveKDTree
+class AdaptiveKDTreeIter;
+class Interface;
+class Range;
+
+class AdaptiveKDTree
 {
 private:
 
-  MBInterface* mbInstance;
-  MBTag planeTag, axisTag, rootTag;
+  Interface* mbInstance;
+  Tag planeTag, axisTag, rootTag;
   unsigned meshSetFlags;
   bool cleanUpTrees;
-  std::vector<MBEntityHandle> createdTrees;
+  std::vector<EntityHandle> createdTrees;
   
 public:
 
-  MBAdaptiveKDTree( MBInterface* iface, 
+  AdaptiveKDTree( Interface* iface, 
                     const char* tagname = 0,
                     unsigned meshset_creation_flags = MESHSET_SET );
 
-  MBAdaptiveKDTree( MBInterface* iface, 
+  AdaptiveKDTree( Interface* iface, 
                     bool destroy_created_trees,
                     const char* tagname = 0,
                     unsigned meshset_creation_flags = MESHSET_SET );
 
-  ~MBAdaptiveKDTree();
+  ~AdaptiveKDTree();
 
   //! Enumeriate split plane directions
   enum Axis { X = 0, Y = 1, Z = 2 };
@@ -77,76 +79,76 @@ public:
   };
   
   //! Get split plane for tree node
-  MBErrorCode get_split_plane( MBEntityHandle node, Plane& plane );
+  ErrorCode get_split_plane( EntityHandle node, Plane& plane );
   
   //! Set split plane for tree node
-  MBErrorCode set_split_plane( MBEntityHandle node, const Plane& plane );
+  ErrorCode set_split_plane( EntityHandle node, const Plane& plane );
   
   //! Get bounding box for entire tree
-  MBErrorCode get_tree_box( MBEntityHandle root_node,
+  ErrorCode get_tree_box( EntityHandle root_node,
                             double box_min_out[3], 
                             double box_max_out[3] );
   
   //! Set bounding box for entire tree
-  MBErrorCode set_tree_box( MBEntityHandle root_node,
+  ErrorCode set_tree_box( EntityHandle root_node,
                             const double box_min[3], 
                             const double box_max[3] );
   
   //! Create tree root node
-  MBErrorCode create_tree( const double box_min[3],
+  ErrorCode create_tree( const double box_min[3],
                            const double box_max[3],
-                           MBEntityHandle& root_handle );
+                           EntityHandle& root_handle );
 
   //! Find all tree roots
-  MBErrorCode find_all_trees( MBRange& results );
+  ErrorCode find_all_trees( Range& results );
 
   //! Destroy a tree
-  MBErrorCode delete_tree( MBEntityHandle root_handle );
+  ErrorCode delete_tree( EntityHandle root_handle );
 
-  MBInterface* moab() { return mbInstance; }
+  Interface* moab() { return mbInstance; }
 
   //! Get iterator for tree
-  MBErrorCode get_tree_iterator( MBEntityHandle tree_root,
-                                 MBAdaptiveKDTreeIter& result );
+  ErrorCode get_tree_iterator( EntityHandle tree_root,
+                                 AdaptiveKDTreeIter& result );
   
   //! Get iterator at right-most ('last') leaf.
-  MBErrorCode get_last_iterator( MBEntityHandle tree_root,
-                                 MBAdaptiveKDTreeIter& result );
+  ErrorCode get_last_iterator( EntityHandle tree_root,
+                                 AdaptiveKDTreeIter& result );
 
   //! Get iterator for tree or subtree
-  MBErrorCode get_sub_tree_iterator( MBEntityHandle tree_root,
+  ErrorCode get_sub_tree_iterator( EntityHandle tree_root,
                                      const double box_min[3], 
                                      const double box_max[3],
-                                     MBAdaptiveKDTreeIter& result );
+                                     AdaptiveKDTreeIter& result );
 
   //! Split leaf of tree
   //! Updates iterator location to point to first new leaf node.
-  MBErrorCode split_leaf( MBAdaptiveKDTreeIter& leaf, Plane plane );
+  ErrorCode split_leaf( AdaptiveKDTreeIter& leaf, Plane plane );
 
   //! Split leaf of tree
   //! Updates iterator location to point to first new leaf node.
-  MBErrorCode split_leaf( MBAdaptiveKDTreeIter& leaf, 
+  ErrorCode split_leaf( AdaptiveKDTreeIter& leaf, 
                           Plane plane,
-                          MBEntityHandle& left_child,
-                          MBEntityHandle& right_child );
+                          EntityHandle& left_child,
+                          EntityHandle& right_child );
   //! Split leaf of tree
   //! Updates iterator location to point to first new leaf node.
-  MBErrorCode split_leaf( MBAdaptiveKDTreeIter& leaf, 
+  ErrorCode split_leaf( AdaptiveKDTreeIter& leaf, 
                           Plane plane,
-                          const MBRange& left_entities,
-                          const MBRange& right_entities );
+                          const Range& left_entities,
+                          const Range& right_entities );
 
   //! Split leaf of tree
   //! Updates iterator location to point to first new leaf node.
-  MBErrorCode split_leaf( MBAdaptiveKDTreeIter& leaf, 
+  ErrorCode split_leaf( AdaptiveKDTreeIter& leaf, 
                           Plane plane,
-                          const std::vector<MBEntityHandle>& left_entities,
-                          const std::vector<MBEntityHandle>& right_entities );
+                          const std::vector<EntityHandle>& left_entities,
+                          const std::vector<EntityHandle>& right_entities );
   
   //! Merge the leaf pointed to by the current iterator with it's
   //! sibling.  If the sibling is not a leaf, multiple merges may
   //! be done.
-  MBErrorCode merge_leaf( MBAdaptiveKDTreeIter& iter );
+  ErrorCode merge_leaf( AdaptiveKDTreeIter& iter );
   
     //! methods for selecting candidate split planes
   enum CandidatePlaneSet {
@@ -171,16 +173,16 @@ public:
   };
   
   //! Build a tree
-  MBErrorCode build_tree( const MBRange& entities,
-                          MBEntityHandle& root_set_out,
+  ErrorCode build_tree( const Range& entities,
+                          EntityHandle& root_set_out,
                           const Settings* settings = 0 );
 
-  MBErrorCode depth( MBEntityHandle root,
+  ErrorCode depth( EntityHandle root,
                      unsigned int& min_depth,
                      unsigned int& max_depth );
 
     //! get some information about the tree
-  MBErrorCode get_info(MBEntityHandle root,
+  ErrorCode get_info(EntityHandle root,
                        double min[3], double max[3], 
                        unsigned int &max_dep);
   
@@ -188,21 +190,21 @@ public:
   //!\param from_coords  The input position to test against
   //!\param closest_point_out  The closest point on the set of triangles in the tree
   //!\param triangle_out The triangle closest to the input position
-  MBErrorCode closest_triangle( MBEntityHandle tree_root,
+  ErrorCode closest_triangle( EntityHandle tree_root,
                                 const double from_coords[3],
                                 double closest_point_out[3],
-                                MBEntityHandle& triangle_out );
+                                EntityHandle& triangle_out );
 
-  MBErrorCode sphere_intersect_triangles( MBEntityHandle tree_root,
+  ErrorCode sphere_intersect_triangles( EntityHandle tree_root,
                                           const double center[3],
                                           double radius,
-                                          std::vector<MBEntityHandle>& triangles );
+                                          std::vector<EntityHandle>& triangles );
 
-  MBErrorCode ray_intersect_triangles( MBEntityHandle tree_root,
+  ErrorCode ray_intersect_triangles( EntityHandle tree_root,
                                        const double tolerance,
                                        const double ray_unit_dir[3],
                                        const double ray_base_pt[3],
-                                       std::vector<MBEntityHandle>& triangles_out,
+                                       std::vector<EntityHandle>& triangles_out,
                                        std::vector<double>& distance_out,
                                        int result_count_limit = 0,
                                        double distance_limit = -1.0);
@@ -215,26 +217,26 @@ public:
   //!   caller can test against that box and not call this method
   //!   at all if the point is outside the box, as there is no leaf
   //!   containing the point in that case.
-  MBErrorCode leaf_containing_point( MBEntityHandle tree_root,
+  ErrorCode leaf_containing_point( EntityHandle tree_root,
                                      const double point[3],
-                                     MBEntityHandle& leaf_out );
+                                     EntityHandle& leaf_out );
 
   //! Get iterator at leaf containing input position.
   //! 
   //! Returns MB_ENTITY_NOT_FOUND if point is not within
   //! bounding box of tree.
-  MBErrorCode leaf_containing_point( MBEntityHandle tree_root,
+  ErrorCode leaf_containing_point( EntityHandle tree_root,
                                      const double xyz[3],
-                                     MBAdaptiveKDTreeIter& result );
+                                     AdaptiveKDTreeIter& result );
 
   //! Find all leaves within a given distance from point in space.
-  MBErrorCode leaves_within_distance( MBEntityHandle tree_root,
+  ErrorCode leaves_within_distance( EntityHandle tree_root,
                                       const double from_point[3],
                                       const double distance,
-                                      std::vector<MBEntityHandle>& leaves_out );
+                                      std::vector<EntityHandle>& leaves_out );
 
   //! Calculate bounding box for entities.
-  MBErrorCode bounding_box( const MBRange& entities,
+  ErrorCode bounding_box( const Range& entities,
                             double box_min_out[3],
                             double box_max_out[3] );
 
@@ -243,15 +245,15 @@ private:
   void init( const char* tagname );
   
   /**\brief find a triangle near the input point */
-  MBErrorCode find_close_triangle( MBEntityHandle root,
+  ErrorCode find_close_triangle( EntityHandle root,
                                    const double from_point[3],
                                    double pt[3],
-                                   MBEntityHandle& triangle );
+                                   EntityHandle& triangle );
 };
                     
 
 //! Iterate over leaves of an adapative kD-tree
-class MBAdaptiveKDTreeIter
+class AdaptiveKDTreeIter
 {
 public:
 
@@ -260,39 +262,39 @@ public:
 private:
   
   struct StackObj {
-    StackObj( MBEntityHandle e, double c ) : entity(e), coord(c) {}
+    StackObj( EntityHandle e, double c ) : entity(e), coord(c) {}
     StackObj() {}
-    MBEntityHandle entity; //!< handle for tree node
+    EntityHandle entity; //!< handle for tree node
     double coord;          //!< box coordinate of parent
   };
   
   enum { BMIN = 0, BMAX = 1 };  //!< indices into mBox and child list
   
   double mBox[2][3];                //!< min and max corners of bounding box
-  MBAdaptiveKDTree* treeTool;       //!< tool for tree
+  AdaptiveKDTree* treeTool;       //!< tool for tree
   std::vector<StackObj> mStack;     //!< stack storing path through tree
-  mutable std::vector<MBEntityHandle> childVect; //!< tempory storage of child handles
+  mutable std::vector<EntityHandle> childVect; //!< tempory storage of child handles
   
   //! Descend tree to left most leaf from current position
   //! No-op if at leaf.
-  MBErrorCode step_to_first_leaf( Direction direction );
+  ErrorCode step_to_first_leaf( Direction direction );
 
-  friend class MBAdaptiveKDTree;
+  friend class AdaptiveKDTree;
 public:
 
-  MBAdaptiveKDTreeIter() : treeTool(0), childVect(2) {}
+  AdaptiveKDTreeIter() : treeTool(0), childVect(2) {}
   
-  MBErrorCode initialize( MBAdaptiveKDTree* tool,
-                          MBEntityHandle root,
+  ErrorCode initialize( AdaptiveKDTree* tool,
+                          EntityHandle root,
                           const double box_min[3],
                           const double box_max[3],
                           Direction direction );
 
-  MBAdaptiveKDTree* tool() const
+  AdaptiveKDTree* tool() const
     { return treeTool; }
 
     //! Get handle for current leaf
-  MBEntityHandle handle() const
+  EntityHandle handle() const
     { return mStack.back().entity; }
   
     //! Get min corner of axis-aligned box for current leaf
@@ -309,7 +311,7 @@ public:
              (mBox[BMAX][2] - mBox[BMIN][2]); }
   
     //! test if a plane intersects the leaf box
-  bool intersects( const MBAdaptiveKDTree::Plane& plane ) const
+  bool intersects( const AdaptiveKDTree::Plane& plane ) const
     { return mBox[BMIN][plane.norm] <= plane.coord &&
              mBox[BMAX][plane.norm] >= plane.coord; }
   
@@ -321,19 +323,19 @@ public:
   //! Note:  stepping past the end of the tree will invalidate
   //!        the iterator.  It will *not* be work step the
   //!        other direction.
-  MBErrorCode step( Direction direction );
+  ErrorCode step( Direction direction );
 
     //! Advance to next leaf
     //! Returns MB_ENTITY_NOT_FOUND if at end.
     //! Note: steping past the end of the tree will invalidate
     //!       the iterator. Calling back() will not work.
-  MBErrorCode step() { return step(RIGHT); }
+  ErrorCode step() { return step(RIGHT); }
 
     //! Move back to previous leaf
     //! Returns MB_ENTITY_NOT_FOUND if at beginning.
     //! Note: steping past the start of the tree will invalidate
     //!       the iterator. Calling step() will not work.
-  MBErrorCode back() { return step(LEFT); }
+  ErrorCode back() { return step(LEFT); }
   
   
     //! Return the side of the box bounding this tree node
@@ -348,7 +350,7 @@ public:
     //!\return MB_ENTITY_NOT FOUND if root node.
     //!        MB_FAILURE if internal error.
     //!        MB_SUCCESS otherwise.
-  MBErrorCode sibling_side( MBAdaptiveKDTree::Axis& axis_out, bool& neg_out ) const;
+  ErrorCode sibling_side( AdaptiveKDTree::Axis& axis_out, bool& neg_out ) const;
 
     //! Get adjacent leaf nodes on side indicated by norm and neg.
     //!
@@ -373,20 +375,20 @@ public:
     //!              this value can be used to control whether or not
     //!              leaves adjacent at only their edges or corners are
     //!              returned.
-  MBErrorCode get_neighbors( MBAdaptiveKDTree::Axis norm, bool neg,
-                             std::vector<MBAdaptiveKDTreeIter>& results,
+  ErrorCode get_neighbors( AdaptiveKDTree::Axis norm, bool neg,
+                             std::vector<AdaptiveKDTreeIter>& results,
                              double epsilon = 0.0 ) const;
   
     //! Get split plane that separates this node from its immediate sibling.
-  MBErrorCode get_parent_split_plane( MBAdaptiveKDTree::Plane& plane ) const;
+  ErrorCode get_parent_split_plane( AdaptiveKDTree::Plane& plane ) const;
   
     //! Return true if thos node and the passed node share the
     //! same immediate parent.
-  bool is_sibling( const MBAdaptiveKDTreeIter& other_leaf ) const;
+  bool is_sibling( const AdaptiveKDTreeIter& other_leaf ) const;
   
     //! Return true if thos node and the passed node share the
     //! same immediate parent.
-  bool is_sibling( MBEntityHandle other_leaf ) const;
+  bool is_sibling( EntityHandle other_leaf ) const;
   
     //! Returns true if calling step() will advance to the
     //! immediate sibling of the current node.  Returns false
@@ -413,5 +415,7 @@ public:
                       const double ray_vect[3],
                       double& t_enter, double& t_exit ) const;
 };
+
+} // namespace moab 
 
 #endif

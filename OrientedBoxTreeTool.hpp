@@ -13,24 +13,26 @@
  * 
  */
 
-/**\file MBOrientedBoxTreeTool.hpp
+/**\file OrientedBoxTreeTool.hpp
  *\author Jason Kraftcheck (kraftche@cae.wisc.edu)
  *\date 2006-07-18
  */
 
-#ifndef MB_ORIENTED_BOX_TREE_TOOL_HPP
-#define MB_ORIENTED_BOX_TREE_TOOL_HPP
+#ifndef MOAB_ORIENTED_BOX_TREE_TOOL_HPP
+#define MOAB_ORIENTED_BOX_TREE_TOOL_HPP
 
-#include "MBForward.hpp"
+#include "moab/Forward.hpp"
 
 #include <iosfwd>
 #include <list>
 #include <vector>
 
-class MBRange;
-class MBOrientedBox;
+namespace moab {
 
-class MBOrientedBoxTreeTool
+class Range;
+class OrientedBox;
+
+class OrientedBoxTreeTool
 {
   public:
   
@@ -85,11 +87,11 @@ class MBOrientedBoxTreeTool
         bool valid() const;
     };
   
-    MBOrientedBoxTreeTool( MBInterface* i, 
+    OrientedBoxTreeTool( Interface* i, 
                            const char* tag_name = 0,
                            bool destroy_created_trees = false ) ;
   
-    ~MBOrientedBoxTreeTool();
+    ~OrientedBoxTreeTool();
   
     /**\brief Build oriented bounding box tree
      *
@@ -99,8 +101,8 @@ class MBOrientedBoxTreeTool
      *\param set_handle_out A handle for the entity set representing the
      *                root of the tree.
      */
-    MBErrorCode build( const MBRange& entities, 
-                       MBEntityHandle& set_handle_out,
+    ErrorCode build( const Range& entities, 
+                       EntityHandle& set_handle_out,
                        const Settings* settings = 0 );
      
     /**\brief Build a tree of sets, where each set contains triangles.
@@ -117,8 +119,8 @@ class MBOrientedBoxTreeTool
      * 3) Build a tree from all the surface OBB tree root sets using this
      *    method to get a combined tree for the volume.
      */
-    MBErrorCode join_trees( const MBRange& tree_roots,
-                            MBEntityHandle& root_set_out,
+    ErrorCode join_trees( const Range& tree_roots,
+                            EntityHandle& root_set_out,
                             const Settings* settings = 0 );
 
     /**\brief Traversal statistics structure
@@ -161,7 +163,7 @@ class MBOrientedBoxTreeTool
         void increment_leaf( unsigned depth );
         void end_traversal( unsigned depth );
 
-      friend class MBOrientedBoxTreeTool;
+      friend class OrientedBoxTreeTool;
 
     };
 
@@ -177,8 +179,8 @@ class MBOrientedBoxTreeTool
      *\param unit_ray_dir  The ray direction vector (must be unit length)
      *\param ray_length    Optional ray length (intersect segment instead of ray.)
      */
-    MBErrorCode ray_intersect_triangles( std::vector<double>& distances_out,
-                                         MBEntityHandle root_set,
+    ErrorCode ray_intersect_triangles( std::vector<double>& distances_out,
+                                         EntityHandle root_set,
                                          double tolerance,
                                          const double ray_point[3],
                                          const double unit_ray_dir[3],
@@ -195,8 +197,8 @@ class MBOrientedBoxTreeTool
      *\param unit_ray_dir  The ray direction vector (must be unit length)
      *\param ray_length    Optional ray length (intersect segment instead of ray.)
      */
-    MBErrorCode ray_intersect_boxes( MBRange& boxes_out,
-                                     MBEntityHandle root_set,
+    ErrorCode ray_intersect_boxes( Range& boxes_out,
+                                     EntityHandle root_set,
                                      double tolerance,
                                      const double ray_point[3],
                                      const double unit_ray_dir[3],
@@ -204,9 +206,9 @@ class MBOrientedBoxTreeTool
                                      TrvStats* accum = 0 );
 
     /**\brief Intersect ray with triangles contained in passed MBENTITYSETs */
-    MBErrorCode ray_intersect_triangles( 
+    ErrorCode ray_intersect_triangles( 
                           std::vector<double>& intersection_distances_out,
-                          const MBRange& leaf_boxes_containing_tris,
+                          const Range& leaf_boxes_containing_tris,
                           double tolerance,
                           const double ray_point[3],
                           const double unit_ray_dir[3],
@@ -234,10 +236,10 @@ class MBOrientedBoxTreeTool
      *\param unit_ray_dir  The ray direction vector (must be unit length)
      *\param ray_length    Optional ray length (intersect segment instead of ray.)
      */
-    MBErrorCode ray_intersect_sets( std::vector<double>& distances_out,
-                                    std::vector<MBEntityHandle>& sets_out,
-                                    std::vector<MBEntityHandle>& facets_out,
-                                    MBEntityHandle root_set,
+    ErrorCode ray_intersect_sets( std::vector<double>& distances_out,
+                                    std::vector<EntityHandle>& sets_out,
+                                    std::vector<EntityHandle>& facets_out,
+                                    EntityHandle root_set,
                                     double tolerance,
                                     unsigned min_tolerace_intersections,
                                     const double ray_point[3],
@@ -254,11 +256,11 @@ class MBOrientedBoxTreeTool
      *\param set_out Set containing closest facet.  0 if tree was not 
      *               constructed using 'set_build'
      */
-    MBErrorCode closest_to_location( const double* point,
-                                     MBEntityHandle tree_root,
+    ErrorCode closest_to_location( const double* point,
+                                     EntityHandle tree_root,
                                      double* point_out,
-                                     MBEntityHandle& facet_out,
-                                     MBEntityHandle* set_out = 0, 
+                                     EntityHandle& facet_out,
+                                     EntityHandle* set_out = 0, 
                                      TrvStats* accum = 0 );
                                      
     /**\brief Find closest facet(s) to input position.
@@ -268,11 +270,11 @@ class MBOrientedBoxTreeTool
      *\param facets_out Closest 2D elements to input position are appended to this list
      *\param sets_out If non-null, sets owning facets are appended to this list.
      */
-    MBErrorCode closest_to_location( const double* point,
-                                     MBEntityHandle tree_root,
+    ErrorCode closest_to_location( const double* point,
+                                     EntityHandle tree_root,
                                      double tolerance,
-                                     std::vector<MBEntityHandle>& facets_out,
-                                     std::vector<MBEntityHandle>* sets_out = 0, 
+                                     std::vector<EntityHandle>& facets_out,
+                                     std::vector<EntityHandle>* sets_out = 0, 
                                      TrvStats* accum = 0 );
     
     /**\brief Find facets intersected by a sphere 
@@ -286,31 +288,31 @@ class MBOrientedBoxTreeTool
      *                  list in an order corresponding to the entries in 
      *                  facets_out.
      */
-    MBErrorCode sphere_intersect_triangles( const double* center,
+    ErrorCode sphere_intersect_triangles( const double* center,
                                         double radius,
-                                        MBEntityHandle tree_root,
-                                        std::vector<MBEntityHandle>& facets_out,
-                                        std::vector<MBEntityHandle>* sets_out = 0, 
+                                        EntityHandle tree_root,
+                                        std::vector<EntityHandle>& facets_out,
+                                        std::vector<EntityHandle>* sets_out = 0, 
                                         TrvStats* accum = 0 );
     
     /**\brief Get oriented box at node in tree
      *
      * Get the oriented box for a node in an oriented bounding box tree.
      */
-    MBErrorCode box( MBEntityHandle node_set,
-                     MBOrientedBox& box );
+    ErrorCode box( EntityHandle node_set,
+                     OrientedBox& box );
     
     /**\brief Get oriented box at node in tree
      *
      * Get the oriented box for a node in an oriented bounding box tree.
      */
-    MBErrorCode box( MBEntityHandle node_set,
+    ErrorCode box( EntityHandle node_set,
                      double center[3],
                      double axis1[3],
                      double axis2[3],
                      double axis3[3] );
                          
-    MBErrorCode delete_tree( MBEntityHandle root_set );
+    ErrorCode delete_tree( EntityHandle root_set );
 
     /**\brief Print out tree
      *
@@ -322,7 +324,7 @@ class MBOrientedBoxTreeTool
      *                      integer tag containing an ID for the entities.
      *                      Not used if list_contents is false.
      */
-    void print( MBEntityHandle tree_root_set, 
+    void print( EntityHandle tree_root_set, 
                 std::ostream& stream,
                 bool list_contents = false,
                 const char* id_tag_name = 0 );
@@ -331,7 +333,7 @@ class MBOrientedBoxTreeTool
      *
      * Print misc. stats. describing tree
      */
-    MBErrorCode stats( MBEntityHandle tree_root_set, std::ostream& stream );
+    ErrorCode stats( EntityHandle tree_root_set, std::ostream& stream );
   
     /**\brief Get tree statistics
      *
@@ -345,7 +347,7 @@ class MBOrientedBoxTreeTool
      * \param node_count Number of nodes in tree
      * \param num_leaves Number of leaf nodes in tree
      */
-  MBErrorCode stats( MBEntityHandle set, 
+  ErrorCode stats( EntityHandle set, 
                      unsigned &entities_in_tree,
                      double &root_volume,
                      double &tot_node_volume,
@@ -367,18 +369,18 @@ class MBOrientedBoxTreeTool
          *
          * This method is called for each node in the tree visited
          * during a pre-order traversal.  
-         *\param node The MBEntityHandle for the entity set for the tree node.
+         *\param node The EntityHandle for the entity set for the tree node.
          *\param depth The current depth in the tree.
          *\param descend Output: if false, traversal will skip children
          *             of the current node, or if the current node is a
          *             leaf, the 'leaf' method will not be called.
          */
-        virtual MBErrorCode visit( MBEntityHandle node,
+        virtual ErrorCode visit( EntityHandle node,
                                    int depth,
                                    bool& descend ) = 0;
        
         /**\brief Process a leaf node during tree traversal */
-        virtual MBErrorCode leaf( MBEntityHandle node ) = 0;
+        virtual ErrorCode leaf( EntityHandle node ) = 0;
 
         virtual ~Op(); // probably isn't necessary in this case, and
                        // does nothing, but lots of compilers warn if
@@ -393,30 +395,32 @@ class MBOrientedBoxTreeTool
      * If operator method passes back the 'descend' argument as false,
      * traversal will not descend to the children of the current node.
      */
-    MBErrorCode preorder_traverse( MBEntityHandle root_set,
+    ErrorCode preorder_traverse( EntityHandle root_set,
                                    Op& operation, 
                                    TrvStats* accum = 0 );
   
-    MBInterface* get_moab_instance() const { return instance; }
+    Interface* get_moab_instance() const { return instance; }
   
     struct SetData;
   private:
   
-    MBErrorCode build_tree( const MBRange& entities, 
-                            MBEntityHandle& set, 
+    ErrorCode build_tree( const Range& entities, 
+                            EntityHandle& set, 
                             int depth,
                             const Settings& settings );
   
-    MBErrorCode build_sets( std::list<SetData>& sets,
-                            MBEntityHandle& node_set,
+    ErrorCode build_sets( std::list<SetData>& sets,
+                            EntityHandle& node_set,
                             int depth,
                             const Settings& settings );
   
-    MBInterface* instance;
-    MBTag tagHandle;
+    Interface* instance;
+    Tag tagHandle;
  
     bool cleanUpTrees;
-    std::vector<MBEntityHandle> createdTrees;
+    std::vector<EntityHandle> createdTrees;
 };
+
+} // namespace moab 
 
 #endif

@@ -13,7 +13,7 @@
  * 
  */
 
-/**\file MBGeometry.hpp
+/**\file Geometry.hpp
  *\author Jason Kraftcheck (kraftche@cae.wisc.edu)
  *\date 2006-07-27
  */
@@ -21,10 +21,12 @@
 #ifndef MB_GEOM_UTIL_HPP
 #define MB_GEOM_UTIL_HPP
 
-#include "MBCartVect.hpp"
+#include "moab/CartVect.hpp"
 #include <cmath>
 
-namespace MBGeomUtil {
+namespace moab {
+
+namespace GeomUtil {
 
 /** Given a line segment and an axis-aligned box, 
  *  return the sub-segment of the line segment that 
@@ -50,10 +52,10 @@ namespace MBGeomUtil {
  *                 Note:  seg_start must be less than seg_end
  *\return true if line semgent intersects box, false otherwise.
  */
-bool segment_box_intersect( MBCartVect box_min,
-                            MBCartVect box_max,
-                            const MBCartVect& seg_pt,
-                            const MBCartVect& seg_unit_dir,
+bool segment_box_intersect( CartVect box_min,
+                            CartVect box_max,
+                            const CartVect& seg_pt,
+                            const CartVect& seg_unit_dir,
                             double& seg_start, double& seg_end );
 
 /**\brief Test for intersection between a ray and a triangle.
@@ -68,9 +70,9 @@ bool segment_box_intersect( MBCartVect box_min,
  *                  intersect test.
  *\return true if intersection, false otherwise.
  */
-bool ray_tri_intersect( const MBCartVect vertices[3],
-                        const MBCartVect& ray_point,
-                        const MBCartVect& ray_unit_direction,
+bool ray_tri_intersect( const CartVect vertices[3],
+                        const CartVect& ray_point,
+                        const CartVect& ray_unit_direction,
                         double tolerance,
                         double& t_out,
                         const double* ray_length = 0 );
@@ -93,10 +95,10 @@ bool ray_tri_intersect( const MBCartVect vertices[3],
     //!                 the ray exited the leaf.  If return value is false,
     //!                 then this value is undefined.
     //!\return true if ray intersects leaf, false otherwise.
-bool ray_box_intersect( const MBCartVect& box_min,
-                        const MBCartVect& box_max,
-                        const MBCartVect& ray_pt,
-                        const MBCartVect& ray_dir,
+bool ray_box_intersect( const CartVect& box_min,
+                        const CartVect& box_max,
+                        const CartVect& ray_pt,
+                        const CartVect& ray_dir,
                         double& t_enter, double& t_exit );
 
 /**\brief Test if plane intersects axis-aligned box
@@ -122,10 +124,10 @@ bool ray_box_intersect( const MBCartVect& box_min,
  *                    +X, +Y, and +Z sides respectively.
  *\return true if overlap, false otherwise.
  */
-bool box_plane_overlap( const MBCartVect& plane_normal, 
+bool box_plane_overlap( const CartVect& plane_normal, 
                         double            plane_coeff,
-                        MBCartVect        box_min_corner, 
-                        MBCartVect        box_max_corner );
+                        CartVect        box_min_corner, 
+                        CartVect        box_max_corner );
 
 /**\brief Test if triangle intersects axis-aligned box
  *
@@ -148,9 +150,9 @@ bool box_plane_overlap( const MBCartVect& plane_normal,
  *                    test.
  *\return true if overlap, false otherwise.
  */
-bool box_tri_overlap( const MBCartVect  triangle_corners[3],
-                      const MBCartVect& box_min_corner,
-                      const MBCartVect& box_max_corner,
+bool box_tri_overlap( const CartVect  triangle_corners[3],
+                      const CartVect& box_min_corner,
+                      const CartVect& box_max_corner,
                       double            tolerance );
 
 /**\brief Test if triangle intersects axis-aligned box
@@ -162,13 +164,13 @@ bool box_tri_overlap( const MBCartVect  triangle_corners[3],
  *                    box_center to the boundary of the box.
  *\return true if overlap, false otherwise.
  */
-bool box_tri_overlap( const MBCartVect  triangle_corners[3],
-                      const MBCartVect& box_center,
-                      const MBCartVect& box_half_dims );
+bool box_tri_overlap( const CartVect  triangle_corners[3],
+                      const CartVect& box_center,
+                      const CartVect& box_half_dims );
 
-bool box_point_overlap( const MBCartVect& box_min_corner,
-                        const MBCartVect& box_max_corner,
-                        const MBCartVect& point,
+bool box_point_overlap( const CartVect& box_min_corner,
+                        const CartVect& box_max_corner,
+                        const CartVect& point,
                         double tolerance );
 
 /**\brief Test if the specified element intersects an axis-aligned box.
@@ -182,10 +184,10 @@ bool box_point_overlap( const MBCartVect& box_min_corner,
  *\param box_half_dims Half of the width of the box in each axial
  *                     direction.
  */
-bool box_elem_overlap( const MBCartVect *elem_corners,
-                       MBEntityType elem_type,
-                       const MBCartVect& box_center,
-                       const MBCartVect& box_half_dims ); 
+bool box_elem_overlap( const CartVect *elem_corners,
+                       EntityType elem_type,
+                       const CartVect& box_center,
+                       const CartVect& box_half_dims ); 
 
 /**\brief Test if the specified element intersects an axis-aligned box.
  *
@@ -198,10 +200,10 @@ bool box_elem_overlap( const MBCartVect *elem_corners,
  *\param box_half_dims Half of the width of the box in each axial
  *                     direction.
  */
-bool box_linear_elem_overlap( const MBCartVect *elem_corners,
-                              MBEntityType elem_type,
-                              const MBCartVect& box_center,
-                              const MBCartVect& box_half_dims ); 
+bool box_linear_elem_overlap( const CartVect *elem_corners,
+                              EntityType elem_type,
+                              const CartVect& box_center,
+                              const CartVect& box_half_dims ); 
 
 /**\brief Test if the specified element intersects an axis-aligned box.
  *
@@ -215,14 +217,14 @@ bool box_linear_elem_overlap( const MBCartVect *elem_corners,
  *\param box_half_dims Half of the width of the box in each axial
  *                     direction.
  */
-bool box_linear_elem_overlap( const MBCartVect *elem_corners,
-                              MBEntityType elem_type,
-                              const MBCartVect& box_half_dims ); 
+bool box_linear_elem_overlap( const CartVect *elem_corners,
+                              EntityType elem_type,
+                              const CartVect& box_half_dims ); 
 
-void closest_location_on_box( const MBCartVect& box_min_corner,
-                              const MBCartVect& box_max_corner,
-                              const MBCartVect& point,
-                              MBCartVect& closest );
+void closest_location_on_box( const CartVect& box_min_corner,
+                              const CartVect& box_max_corner,
+                              const CartVect& point,
+                              CartVect& closest );
 
 /**\brief find closest location on triangle
  *
@@ -231,9 +233,9 @@ void closest_location_on_box( const MBCartVect& box_min_corner,
  *\param vertices  Array of three corner vertex coordinates.
  *\param closest_out Result position 
  */
-void closest_location_on_tri( const MBCartVect& location,
-                              const MBCartVect* vertices,
-                              MBCartVect& closest_out );
+void closest_location_on_tri( const CartVect& location,
+                              const CartVect* vertices,
+                              CartVect& closest_out );
 
 /**\brief find closest location on polygon
  *
@@ -243,10 +245,10 @@ void closest_location_on_tri( const MBCartVect& location,
  *\param num_vertices Length of 'vertices' array.
  *\param closest_out Result position 
  */
-void closest_location_on_polygon( const MBCartVect& location,
-                                  const MBCartVect* vertices,
+void closest_location_on_polygon( const CartVect& location,
+                                  const CartVect* vertices,
                                   int num_vertices,
-                                  MBCartVect& closest_out );
+                                  CartVect& closest_out );
 
 /**\brief find closest topological location on triangle
  *
@@ -260,23 +262,23 @@ void closest_location_on_polygon( const MBCartVect& location,
  *                     3-5 : edge beginning at closest_topo - 3
  *                       6 : triangle interior
  */
-void closest_location_on_tri( const MBCartVect& location,
-                              const MBCartVect* vertices,
+void closest_location_on_tri( const CartVect& location,
+                              const CartVect* vertices,
                               double tolerance,
-                              MBCartVect& closest_out,
+                              CartVect& closest_out,
                               int& closest_topo );
 
 // Finds whether or not a box defined by the center and the half
 // width intersects a trilinear hex defined by its eight vertices.
-bool box_hex_overlap( const MBCartVect hexv[8],
-                      const MBCartVect& box_center,
-                      const MBCartVect& box_dims);
+bool box_hex_overlap( const CartVect hexv[8],
+                      const CartVect& box_center,
+                      const CartVect& box_dims);
 
 // Finds whether or not a box defined by the center and the half
 // width intersects a linear tetrahedron defined by its four vertices.
-bool box_tet_overlap( const MBCartVect tet_corners[4],
-                      const MBCartVect& box_center,
-                      const MBCartVect& box_dims);
+bool box_tet_overlap( const CartVect tet_corners[4],
+                      const CartVect& box_center,
+                      const CartVect& box_dims);
 
 //
 // point_in_trilinear_hex
@@ -286,10 +288,12 @@ bool box_tet_overlap( const MBCartVect tet_corners[4],
 // and checks if each are between +/-1.  If anyone is outside the range
 // the function returns false, otherwise it returns true.
 //
-bool point_in_trilinear_hex(const MBCartVect *hex, 
-                            const MBCartVect& xyz,
+bool point_in_trilinear_hex(const CartVect *hex, 
+                            const CartVect& xyz,
                             double etol);
 
-} // namespace MBGeoemtry
+} // namespace GeomUtil
+
+} // namespace moab
 
 #endif

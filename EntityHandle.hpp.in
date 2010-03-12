@@ -1,5 +1,5 @@
-#ifndef MB_ENTITY_HANDLE_H
-#define MB_ENTITY_HANDLE_H
+#ifndef MOAB_ENTITY_HANDLE_HPP
+#define MOAB_ENTITY_HANDLE_HPP
 
 /* MOAB qualified HAVE_INTTYPES_H */
 #undef MOAB_HAVE_INTTYPES_H
@@ -51,31 +51,27 @@
 # include <sys/types.h>
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace moab {
 
 #ifdef MOAB_FORCE_64_BIT_HANDLES
-  typedef uint64_t MBEntityHandle;
-  typedef  int64_t MBEntityID;
+  typedef uint64_t EntityHandle;
+  typedef  int64_t EntityID;
 #elif defined (MOAB_FORCE_32_BIT_HANDLES)
-  typedef uint32_t MBEntityHandle;
-  typedef  int32_t MBEntityID;
+  typedef uint32_t EntityHandle;
+  typedef  int32_t EntityID;
 #else
 # ifdef MOAB_HAVE_SIZE_T
-    typedef size_t MBEntityHandle;
+    typedef size_t EntityHandle;
 # else
-    typedef unsigned long MBEntityHandle;
+    typedef unsigned long EntityHandle;
 # endif
 # ifdef MOAB_HAVE_PTRDIFF_T
-    typedef ptrdiff_t MBEntityID;
+    typedef ptrdiff_t EntityID;
 # else
-    typedef long MBEntityID;
+    typedef long EntityID;
 # endif
 #endif 
 
-#ifdef __cplusplus
-} // extern "C"
-#endif
+} // namespace moab
 
 #endif

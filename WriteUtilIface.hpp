@@ -14,28 +14,30 @@
  */
 
 
-#ifndef MB_WRITE_UTIL_IFACE_HPP
-#define MB_WRITE_UTIL_IFACE_HPP
+#ifndef MOAB_WRITE_UTIL_IFACE_HPP
+#define MOAB_WRITE_UTIL_IFACE_HPP
 
 
-#include "MBRange.hpp"
+#include "moab/Range.hpp"
 #include <vector>
 
+namespace moab {
+
 //! Interface implemented in MOAB which provides memory for mesh reading utilities
-class MB_DLL_EXPORT MBWriteUtilIface
+class MB_DLL_EXPORT WriteUtilIface
 {
 public:
 
     //! constructor
-  MBWriteUtilIface(){}
+  WriteUtilIface(){}
 
     //! destructor
-  virtual ~MBWriteUtilIface(){}
+  virtual ~WriteUtilIface(){}
   
     //! Check if the specified file already exists.
     //! Returns MB_SUCCESS if file does not exist, MB_ALREADY_ALLOCATED
     //! if file does exist, or MB_FAILURE for some other error condition.
-  virtual MBErrorCode check_doesnt_exist( const char* file_name ) = 0;
+  virtual ErrorCode check_doesnt_exist( const char* file_name ) = 0;
 
     //! Given information about the nodes to be written, and pointers to memory
     //! to which coordinates will be written, writes coordinate data there, and
@@ -47,11 +49,11 @@ public:
     //! \param start_node_id Starting value for node ids
     //! \param arrays Pointers to memory where coordinate data will be written
     //! \return status Return status
-  virtual MBErrorCode get_node_arrays(
+  virtual ErrorCode get_node_arrays(
     const int num_arrays,
     const int num_nodes, 
-    const MBRange& entities, 
-    MBTag node_id_tag,
+    const Range& entities, 
+    Tag node_id_tag,
     const int start_node_id,
     std::vector<double*>& arrays
     ) = 0;
@@ -74,10 +76,10 @@ public:
    *\param output_array The memory in which to write the node coordinates.
    *\author Jason Kraftcheck
    */
-  virtual MBErrorCode get_node_array(
+  virtual ErrorCode get_node_array(
       const int which_array, 
-      MBRange::const_iterator begin,
-      const MBRange::const_iterator end,
+      Range::const_iterator begin,
+      const Range::const_iterator end,
       const size_t output_size,
       double* const output_array
       ) = 0;
@@ -94,12 +96,12 @@ public:
     //! \param start_element_id Starting value for element ids
     //! \param array Pointer to memory where connectivity data will be written
     //! \return status Return status
-  virtual MBErrorCode get_element_array(
+  virtual ErrorCode get_element_array(
     const int num_elements, 
     const int verts_per_element,
-    MBTag node_id_tag,
-    const MBRange& entities, 
-    MBTag element_id_tag,
+    Tag node_id_tag,
+    const Range& entities, 
+    Tag element_id_tag,
     int start_element_id,
     int* array
     ) = 0;
@@ -131,11 +133,11 @@ public:
    *                    connectivity list.
    *\author Jason Kraftcheck
    */
-  virtual MBErrorCode get_element_array(
-      MBRange::const_iterator begin,
-      const MBRange::const_iterator end,
+  virtual ErrorCode get_element_array(
+      Range::const_iterator begin,
+      const Range::const_iterator end,
       const int vertices_per_elem,
-      MBTag node_id_tag,
+      Tag node_id_tag,
       const size_t array_size, 
       int *const element_array
       ) = 0;
@@ -165,12 +167,12 @@ public:
    *                    connectivity list.
    *\author Jason Kraftcheck
    */
-  virtual MBErrorCode get_element_array(
-      MBRange::const_iterator begin,
-      const MBRange::const_iterator end,
+  virtual ErrorCode get_element_array(
+      Range::const_iterator begin,
+      const Range::const_iterator end,
       const int vertices_per_elem,
       const size_t array_size, 
-      MBEntityHandle *const element_array
+      EntityHandle *const element_array
       ) = 0;
 
 
@@ -181,9 +183,9 @@ public:
    *              For the specified range of polyhedra.
    *\author Jason Kraftcheck
    */
-  virtual MBErrorCode get_poly_array_size(
-      MBRange::const_iterator begin,
-      const MBRange::const_iterator end,
+  virtual ErrorCode get_poly_array_size(
+      Range::const_iterator begin,
+      const Range::const_iterator end,
       int& connectivity_size 
       ) = 0;
    
@@ -228,10 +230,10 @@ public:
    *                          presumably want to pass to the next call.)
    *\author Jason Kraftcheck
    */
-  virtual MBErrorCode get_poly_arrays(
-      MBRange::const_iterator& iter,
-      const MBRange::const_iterator end,
-      const MBTag node_id_tag,
+  virtual ErrorCode get_poly_arrays(
+      Range::const_iterator& iter,
+      const Range::const_iterator end,
+      const Tag node_id_tag,
       size_t& element_array_len,
       int *const element_array,
       size_t& index_array_len,
@@ -244,10 +246,10 @@ public:
     //! \param node_bit_mark_tag Bit tag to use to identify nodes
     //! \param nodes Range of nodes gathered from elements (returned)
     //! \return status Return status
-  virtual MBErrorCode gather_nodes_from_elements(
-    const MBRange& elements,
-    const MBTag node_bit_mark_tag,
-    MBRange& nodes
+  virtual ErrorCode gather_nodes_from_elements(
+    const Range& elements,
+    const Tag node_bit_mark_tag,
+    Range& nodes
     ) = 0;
 
     //! assign ids to input entities starting with start_id, written to id_tag
@@ -256,8 +258,8 @@ public:
     //! \param id_tag Tag used to store entity id
     //! \param start_id Starting value for entity ids
     //! \return status Return status
-  virtual MBErrorCode assign_ids(MBRange &elements,
-                                 MBTag id_tag,
+  virtual ErrorCode assign_ids(Range &elements,
+                                 Tag id_tag,
                                  const int start_id) = 0;
   
 
@@ -272,15 +274,15 @@ public:
    *\param adj     The output list of global IDs of adjacent entities.
    *\author Jason Kraftcheck
    */
-  virtual MBErrorCode get_adjacencies(
-      MBEntityHandle entity,
-      MBTag id_tag,
+  virtual ErrorCode get_adjacencies(
+      EntityHandle entity,
+      Tag id_tag,
       std::vector<int>& adj 
   ) = 0;
   
   
-  virtual MBErrorCode get_adjacencies( MBEntityHandle entity,
-                               const MBEntityHandle*& adj_array,
+  virtual ErrorCode get_adjacencies( EntityHandle entity,
+                               const EntityHandle*& adj_array,
                                int& num_adj ) = 0;
 
   
@@ -307,20 +309,20 @@ public:
    *
    *\author Jason Kraftcheck
    */
-  virtual MBErrorCode 
-  get_tag_list( std::vector<MBTag>& result_list,
-                const MBTag* user_tag_list = 0, 
+  virtual ErrorCode 
+  get_tag_list( std::vector<Tag>& result_list,
+                const Tag* user_tag_list = 0, 
                 int user_tag_list_length = 0,
                 bool include_variable_length_tags = true ) = 0;
 
     //! if an error occured when reading the mesh, report it to MB
-    //! it makes sense to have this as long as MBInterface has a write_mesh function
+    //! it makes sense to have this as long as Interface has a write_mesh function
     //! \return status Return status
-  virtual MBErrorCode report_error( const std::string& error ) = 0;
+  virtual ErrorCode report_error( const std::string& error ) = 0;
   
     //! overloaded report_error behaves like the above
     //! \return status Return status
-  virtual MBErrorCode report_error( const char* error, ... ) 
+  virtual ErrorCode report_error( const char* error, ... ) 
 #ifdef __GNUC__
 __attribute__((format(printf,2,3)))
 #endif
@@ -330,7 +332,7 @@ __attribute__((format(printf,2,3)))
 
   
 template <typename T> inline 
-void MBWriteUtilIface::reorder( const int* order, T* conn, 
+void WriteUtilIface::reorder( const int* order, T* conn, 
                                 int num_elem, int node_per_elem )
 {
   std::vector<T> elem(node_per_elem);
@@ -341,6 +343,8 @@ void MBWriteUtilIface::reorder( const int* order, T* conn,
       *conn = elem[order[j]];
   }
 }
+
+} // namespace moab 
 
 #endif 
 
