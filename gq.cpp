@@ -53,18 +53,18 @@ void complete_square ( double A,
 
 
 void get_translation( double A,
-		  double B,
-		  double C, 
-		  double D, 
-		  double E,
-		  double F,
-		  double G, 
-		  double H, 
-		  double J,
-		  double K,
-		  double &dx,
-		  double &dy, 
-		  double &dz);
+		      double B,
+		      double C, 
+		      double D, 
+		      double E,
+		      double F,
+		      double G, 
+		      double H, 
+		      double J,
+		      double K,
+		      double &dx,
+		      double &dy, 
+		      double &dz);
 
 /*
  Desription: Program for the creation of a Generalized Quadratic (GQ) surface using CGM
@@ -111,7 +111,13 @@ int main ( int argc, char** argv ) {
 
   //The first step is to characterize the surface
   int type = characterize_surf(A,B,C,D,E,F,G,H,J,K);
-  
+
+  if (!type)
+    {
+      std::cout << "This GQ type is not yet supported. Exiting..." << std::endl;
+      return 1;
+    }
+
   std::cout << "This GQ has type: " << type << std::endl; 
 
   double dx, dy, dz; 
@@ -173,8 +179,7 @@ int characterize_surf( double A,
     return TWO_SHEET_HYPERBOLOID;
   else if ( num_neg == 1 && num_zero == 0 && !rhs )
     return ELLIPTIC_CONE;
-  else
-    std::cout << "GQ type is unsupported" << std::endl;
+
   
   return 0;
 
