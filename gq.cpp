@@ -16,10 +16,14 @@
 
 enum GQ_TYPE {UNKNOWN = 0,
 	      ELLIPSOID,
-	      HYPERBOLOID,
-	      CONE,
-	      PARABOLOID,
-	      CYLINDER};
+	      ONE_SHEET_HYPERBOLOID,
+	      TWO_SHEET_HYPERBOLOID,
+	      ELLIPTIC_CONE,
+	      ELLIPTIC_PARABOLOID,
+	      HYPERBOLIC_PARABOLOID,
+	      ELLIPTIC_CYL,
+	      HYPERBOLIC_CYL,
+	      PARABOLOIC_CYL};
 
 int characterize_surf( double A,
 		       double B,
@@ -106,9 +110,13 @@ int main ( int argc, char** argv ) {
     }
 
   //The first step is to characterize the surface
-  characterize_surf(A,B,C,D,E,F,G,H,J,K);
+  int type = characterize_surf(A,B,C,D,E,F,G,H,J,K);
   
+  std::cout << "This GQ has type: " << type << std::endl; 
 
+  double dx, dy, dz; 
+  
+  get_translation(A,B,C,D,E,F,G,H,J,K,dx,dy,dz);
 
   return 0;
 
@@ -143,7 +151,31 @@ int characterize_surf( double A,
 
   std::cout << "rhs= " << rhs << std::endl;
 
+  //now start to determine what kind of surface we have 
+  int num_zero = 0;
+  int num_neg = 0;
 
+  //count negative coefficients
+  if ( a < 0 ) num_neg++;
+  if ( b < 0 ) num_neg++;
+  if ( c < 0 ) num_neg++;
+
+  //count zero coefficients
+  if ( a == 0) num_zero++;
+  if ( b == 0) num_zero++;
+  if ( c == 0) num_zero++;
+
+  if ( num_neg == 0 && num_zero == 0 && rhs)
+    return ELLIPSOID;
+  else if ( num_neg == 1 && num_zero == 0 && rhs )
+    return ONE_SHEET_HYPERBOLOID;
+  else if ( num_neg == 2 && num_zero == 0 && rhs )
+    return TWO_SHEET_HYPERBOLOID;
+  else if ( num_neg == 1 && num_zero == 0 && !rhs )
+    return ELLIPTIC_CONE;
+  else
+    std::cout << "GQ type is unsupported" << std::endl;
+  
   return 0;
 
 }
@@ -171,11 +203,14 @@ void complete_square ( double A,
   W += (B == 0) ? 0 : (H*H)/(4*B);
   W += (C == 0) ? 0 : (J*J)/(4*C);
 
-  a = A/W;
 
-  b = B/W;
+  double dum = ( W == 0 ) ? 1 : W;
+
+  a = A/dum;
+
+  b = B/dum;
   
-  c = C/W;
+  c = C/dum;
 
   rhs = ( W == 0 ) ? 0 : 1;
 
@@ -201,6 +236,10 @@ void get_translation( double A,
   dx = (A == 0) ? 0 : G/(2*A);
   dy = (B == 0) ? 0 : H/(2*B);
   dz = (C == 0) ? 0 : J/(2*C);
+
+  if ( G < 0 ) dx *= -1;
+  if ( H < 0 ) dy *= -1;
+  if ( J < 0 ) dz *= -1;
 
   return;
 
