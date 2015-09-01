@@ -102,6 +102,13 @@ int main ( int argc, char** argv ) {
 
   po.parseCommandLine( argc, argv );
 
+  //make sure this is actually a quadratic surface
+  if ( A == 0 && B == 0 && C == 0 )
+    {
+      std::cout << "All 2nd order coeffs are zero. This is not a GQ. Exiting..." << std::endl;
+      return 1;
+    }
+
   //let's rule out rotations (for now)
   if ( D != 0 || E != 0 || F !=0 )
     {
@@ -179,6 +186,16 @@ int characterize_surf( double A,
     return TWO_SHEET_HYPERBOLOID;
   else if ( num_neg == 1 && num_zero == 0 && !rhs )
     return ELLIPTIC_CONE;
+  else if ( num_neg == 0 && num_zero == 1 && !rhs )
+    return ELLIPTIC_PARABOLOID;
+  else if ( num_neg == 1 && num_zero == 1 && !rhs )
+    return HYPERBOLIC_PARABOLOID;
+  else if ( num_neg == 0 && num_zero == 1 && rhs )
+    return ELLIPTIC_CYL;
+  else if ( num_neg == 1 && num_zero == 1 && rhs )
+    return HYPERBOLIC_CYL;
+  else if ( num_zero == 2 && !rhs )
+    return PARABOLOIC_CYL;
 
   
   return 0;
