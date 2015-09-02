@@ -45,6 +45,15 @@ std::ostream& operator<<(std::ostream& out, const GQ_TYPE value){
 }
 
 
+//doing this globally for now to make function signatures easier to write
+CubitStatus stat = InitCGMA::initialize_cgma(); 
+
+GeometryModifyTool *gmt = GeometryModifyTool::instance();
+
+
+
+RefVolume* elliptic_cone( double a, double b, double c, double k );
+
 GQ_TYPE characterize_surf( double A,
 		       double B,
 		       double C, 
@@ -97,11 +106,6 @@ void get_translation( double A,
 */
 int main ( int argc, char** argv ) {
 
-
-  CubitStatus stat = InitCGMA::initialize_cgma(); 
-
-  GeometryModifyTool *gmt = GeometryModifyTool::instance();
-
   double A,B,C,D,E,F,G,H,J,K;
   std::string filename = "GQ.sat";
 
@@ -146,6 +150,13 @@ int main ( int argc, char** argv ) {
     }
 
   std::cout << "This GQ has type: " << type << std::endl; 
+
+  //should be created by now, time to export
+  DLIList<RefEntity*> exp_bodies;
+  int exp_ents;
+  CubitString cubit_version("12.2");
+  
+  CubitCompat_export_solid_model(exp_bodies, filename.c_str(), "ACIS_SAT", exp_ents, cubit_version);
 
   double dx, dy, dz; 
   
@@ -198,6 +209,7 @@ GQ_TYPE characterize_surf( double A,
   if ( b == 0) num_zero++;
   if ( c == 0) num_zero++;
 
+
   if ( num_neg == 0 && num_zero == 0 && rhs)
     return ELLIPSOID;
   else if ( num_neg == 1 && num_zero == 0 && rhs )
@@ -205,7 +217,10 @@ GQ_TYPE characterize_surf( double A,
   else if ( num_neg == 2 && num_zero == 0 && rhs )
     return TWO_SHEET_HYPERBOLOID;
   else if ( num_neg == 1 && num_zero == 0 && !rhs )
-    return ELLIPTIC_CONE;
+    {
+      elliptic_cone( a, b, c, rhs );
+      return ELLIPTIC_CONE;
+    }
   else if ( num_neg == 0 && num_zero == 1 && !rhs )
     return ELLIPTIC_PARABOLOID;
   else if ( num_neg == 1 && num_zero == 1 && !rhs )
@@ -284,5 +299,56 @@ void get_translation( double A,
   if ( J/C < 0 ) dz *= -1;
 
   return;
+
+}
+
+
+RefVolume* elliptic_cone( double a, double b, double c, double k )
+{
+
+  //make sure that k is zero for this case
+  if ( k != 0 ) 
+    {
+      std::cout << "Should not be here. Constant of the GQ is non-zero. Exiting..." << std::endl;
+      exit(1);
+    }
+
+  double h,min_rad,maj_rad;
+  h = 0;
+
+  int axis = 3;
+  //figure out which of the coefficients is negative and set params accordingly
+  if ( a < 0 ) 
+    {
+      h = sqrt(fabs(a));
+      min_rad = (b < c) ? b : c;
+      maj_rad = (b < c) ? c : b;
+      axis = 0;
+    }
+  else if ( b < 0) 
+    { 
+      h = sqrt(fabs(b));
+      min_rad = (a < c) ? a : c;
+      maj_rad = (a < c) ? c : a;
+      axis = 1;
+    }
+  else if ( c < 0 ) 
+    {
+      h = sqrt(fabs(c));
+      min_rad = ( a < b ) ? a : b;
+      maj_rad = ( a < b ) ? b : a;
+      axis = 2;
+    }
+ 
+  if ( 0 == h || 3 == axis ) 
+    {
+      std::cout << "Could not find a negtaive coefficient. Error. Exiting..." << std::endl;
+      exit(1);
+    }
+
+  
+  
+  //fortunately there is a direct cgm function for this
+  Body* ent = gmt->cylinder( h, min_rad, maj_rad, 0);
 
 }
