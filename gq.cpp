@@ -49,10 +49,12 @@ std::ostream& operator<<(std::ostream& out, const GQ_TYPE value){
 CubitStatus stat = InitCGMA::initialize_cgma(); 
 
 GeometryModifyTool *gmt = GeometryModifyTool::instance();
+GeometryQueryTool *gqt = GeometryQueryTool::instance();
 
 
+void elliptic_cone(double a, double b, double c, double k);
+void elliptic_paraboloid(double a, double b, double c, double k);
 
-RefVolume* elliptic_cone( double a, double b, double c, double k );
 
 GQ_TYPE characterize_surf( double A,
 		       double B,
@@ -78,7 +80,8 @@ void complete_square ( double A,
 		       double &a,
 		       double &b, 
 		       double &c, 
-		       double &rhs); 
+		       double &rhs,
+		       double &W);
 
 
 void get_translation( double A,
@@ -182,9 +185,9 @@ GQ_TYPE characterize_surf( double A,
 
   //first things first, complete the square to get the equation in the correct form
   
-  double a,b,c,rhs;
+  double a,b,c,rhs,W;
 
-  complete_square( A,B,C,D,E,F,G,H,J,K,a,b,c,rhs);
+  complete_square(A,B,C,D,E,F,G,H,J,K,a,b,c,rhs,W);
   
 
   std::cout << "a= " << a << std::endl;
@@ -222,7 +225,10 @@ GQ_TYPE characterize_surf( double A,
       return ELLIPTIC_CONE;
     }
   else if ( num_neg == 0 && num_zero == 1 && !rhs )
-    return ELLIPTIC_PARABOLOID;
+    {
+      elliptic_paraboloid( a, b, c, rhs );
+      return ELLIPTIC_PARABOLOID;
+    }
   else if ( num_neg == 1 && num_zero == 1 && !rhs )
     return HYPERBOLIC_PARABOLOID;
   else if ( num_neg == 0 && num_zero == 1 && rhs )
@@ -251,11 +257,11 @@ void complete_square ( double A,
 		       double &a,
 		       double &b, 
 		       double &c, 
-		       double &rhs)
+		       double &rhs,
+		       double &W)
 {
 
-  double W = -K;
- 
+  W = -K;
   W += (A == 0) ? 0 : (G*G)/(4*A);
   W += (B == 0) ? 0 : (H*H)/(4*B);
   W += (C == 0) ? 0 : (J*J)/(4*C);
@@ -303,7 +309,7 @@ void get_translation( double A,
 }
 
 
-RefVolume* elliptic_cone( double a, double b, double c, double k )
+void elliptic_cone( double a, double b, double c, double k )
 {
 
   //make sure that k is zero for this case
@@ -313,7 +319,8 @@ RefVolume* elliptic_cone( double a, double b, double c, double k )
       exit(1);
     }
 
-  double h,min_rad,maj_rad;
+  bool pre_rot;
+  double h,mnr,mjr;
   h = 0;
 
   int axis = 3;
@@ -321,22 +328,25 @@ RefVolume* elliptic_cone( double a, double b, double c, double k )
   if ( a < 0 ) 
     {
       h = sqrt(fabs(a));
-      min_rad = (b < c) ? b : c;
-      maj_rad = (b < c) ? c : b;
-      axis = 0;
+      pre_rot = (b < c); // if the major axis is not along b, an extra rotation is needed
+      mnr = pre_rot ? b : c;
+      mjr = pre_rot ? c : b;
+      axis = 1;
     }
   else if ( b < 0) 
     { 
       h = sqrt(fabs(b));
-      min_rad = (a < c) ? a : c;
-      maj_rad = (a < c) ? c : a;
-      axis = 1;
+      pre_rot = (a < c); // if the major axes is not along a, an extra rotation is needed
+      mnr = pre_rot ? a : c;
+      mjr = pre_rot ? c : a;
+      axis = 0;
     }
   else if ( c < 0 ) 
     {
       h = sqrt(fabs(c));
-      min_rad = ( a < b ) ? a : b;
-      maj_rad = ( a < b ) ? b : a;
+      pre_rot = (a < b); // if the minor axes it not along b, an extra rotation is needed
+      mnr = pre_rot ? a : b;
+      mjr = pre_rot ? b : a;
       axis = 2;
     }
  
@@ -346,9 +356,46 @@ RefVolume* elliptic_cone( double a, double b, double c, double k )
       exit(1);
     }
 
-  
-  
+  CubitStatus result;
+
   //fortunately there is a direct cgm function for this
-  Body* ent = gmt->cylinder( h, min_rad, maj_rad, 0);
+  Body* ent = gmt->cylinder( h, mjr, mnr, 0);
+  
+  //if the minor/major radii need to be switched, do it now
+  if (pre_rot)
+    {
+      result = gqt->rotate(ent,CubitVector(0,0,1),90);
+      if (result != CUBIT_SUCCESS)
+	std::cout << "Error rotating entity." << std::endl;
+    }
+  
+
+  if ( 2 != axis ) //only re-orient the body if h is not along z-axis
+    {
+      double rot_axis[3] = {0,0,0};
+
+      rot_axis[axis] = 1;
+
+      double angle = (axis) ? 90 : -90;
+
+      CubitVector ax(rot_axis[0],rot_axis[1],rot_axis[2]);
+
+      std::cout << rot_axis[0] << rot_axis[1] << rot_axis[2]  << std::endl;
+
+      result = gqt->rotate(ent,ax,angle);
+      if ( result != CUBIT_SUCCESS )
+	std::cout << "Error rotating entity." << std::endl;
+    }
+
+
+}
+
+void elliptic_paraboloid( double a, double b, double c, double k )
+{
+
+  //figure out which direction is zero
+  
+
+
 
 }
