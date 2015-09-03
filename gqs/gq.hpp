@@ -51,6 +51,7 @@ std::ostream& operator<<(std::ostream& out, const GQ_TYPE value){
 void elliptic_cone(double a, double b, double c, double g, double h, double j, double k);
 void elliptic_paraboloid(double a, double b, double c, double g, double h, double j, double k);
 void elliptic_cyl(double a, double b, double c, double g, double h, double j, double k);
+void parabolic_cyl(double a, double b, double c, double g, double h, double j, double k);
 
 GQ_TYPE characterize_surf( double A,
 		       double B,

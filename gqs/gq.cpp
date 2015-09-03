@@ -152,7 +152,10 @@ GQ_TYPE characterize_surf( double A,
   else if ( num_neg == 1 && num_zero == 1 && rhs )
     return HYPERBOLIC_CYL;
   else if ( num_zero == 2 && !rhs )
-    return PARABOLIC_CYL;
+    {
+      parabolic_cyl(a,b,c,g,h,j,rhs);
+      return PARABOLIC_CYL;
+    }
 
   
   return UNKNOWN;
@@ -490,3 +493,88 @@ void elliptic_cyl(double a, double b, double c, double g, double h, double j, do
   
   return;
 }
+
+void parabolic_cyl(double a, double b, double c, double g, double h, double j, double k)
+{
+  
+  CubitVector ax1,ax2;
+  double alpha; //equation of the form y = alpha*x^2
+
+  //find the non-negative 2nd order coeff
+  if (a != 0) 
+    {
+      const double ax[3] = {1,0,0};
+      ax1.set(ax);
+      alpha = a;
+    }
+  else if (b != 0)
+    { 
+      const double ax[3] = {0,1,0};
+      ax1.set(ax);
+      alpha = b;
+    }
+  else if (c != 0) 
+    {
+      const double ax[3] = {0,0,1};
+      ax1.set(ax);
+      alpha = c;
+    }
+  
+  if (g != 0) 
+    {
+      const double ax[3] = {1,0,0};
+      ax2.set(ax);
+      alpha/=g;
+    }
+  else if (h != 0)
+    { 
+      const double ax[3] = {0,1,0};
+      ax2.set(ax);
+      alpha/=h;
+    }
+  else if (j != 0) 
+    {
+      const double ax[3] = {0,0,1};
+      ax2.set(ax);
+      alpha/=j;
+    }
+
+  CubitVector gen_ax = ax1*ax2;
+
+  //get value along ax1 at height
+  double height = 10;
+  double mag = sqrt(fabs(height/alpha));
+  DLIList<RefEdge*> bounding_curves;
+
+  //create a trace of the parabola
+  CubitVector p1 = mag*ax1 + height*ax2;
+  RefVertex* v1 = gmt->make_RefVertex(p1);
+
+  CubitVector p2 = -mag*ax1 + height*ax2;
+  RefVertex* v2 = gmt->make_RefVertex(p2);
+
+  CubitVector origin(0,0,0);
+
+  RefEdge* parab = gmt->make_RefEdge(PARABOLA_CURVE_TYPE,v1,v2,&origin);
+  bounding_curves.insert(parab);
+
+  RefEdge* line = gmt->make_RefEdge(STRAIGHT_CURVE_TYPE, v1, v2);
+  bounding_curves.insert(line);
+
+  RefFace* trace = gmt->make_RefFace(TORUS_SURFACE_TYPE,bounding_curves,true);
+
+
+  RefEntity* ent = dynamic_cast<RefEntity*>(trace);
+
+  DLIList<RefEntity*> sweep_ents;
+  sweep_ents.insert(ent);
+
+  DLIList<Body*> new_bodies;
+  
+
+  double length = 10; //arbitrary length for now
+  CubitStatus result = gmt->sweep_translational(sweep_ents, length*gen_ax, 0, 0, CUBIT_FALSE, CUBIT_FALSE, CUBIT_TRUE, CUBIT_FALSE, new_bodies);
+  
+  return;
+}
+
