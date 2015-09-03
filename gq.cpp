@@ -435,6 +435,7 @@ if ( 3 == axis )
 
  double height = 10; //some arbitrarily large height
  double mag = sqrt(fabs(height/r1)); //value of the trace at that height
+ height *= (r1 < 0) ? -1 : 1;
  
  double p1[3] = {0,0,0};
  p1[(a == 0)] = -mag; //<-- didn't know you could do this
@@ -485,7 +486,8 @@ if ( 3 == axis )
  
  DLIList<Body*> new_bodies;
  CubitVector sweep_point(0,0,0);
- double sweep_ax[3] = {0,0,1};
+ double sweep_ax[3] = {0,0,0};
+ sweep_ax[axis] = 1;
  CubitVector sweep_axis(sweep_ax[0],sweep_ax[1],sweep_ax[2]);
  
  result = gmt->sweep_rotational(surf_to_sweep, sweep_point, sweep_axis, 2*CUBIT_PI, new_bodies, CUBIT_FALSE, CUBIT_FALSE);
@@ -500,10 +502,7 @@ if ( 3 == axis )
  
  double scale_factor = r2/r1;
  std::cout << scale_factor << std::endl;
- double scale_factors[3];
- scale_factors[0] = 1;
- scale_factors[1] = 1;
- scale_factors[2] = 1;
+ double scale_factors[3] = {1,1,1};
  scale_factors[2-(c == 0)] = scale_factor;
  
  CubitVector factors(scale_factors[0],scale_factors[1],scale_factors[2]);
