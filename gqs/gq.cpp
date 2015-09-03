@@ -407,42 +407,45 @@ void elliptic_cone( double a, double b, double c, double g, double h, double j, 
   double r1,r2;
   int axis = 3;
   //figure out which direction is zero
-  if ( a == 0 ) 
+  if (a == 0) 
     {
       axis = 0;
       r1 = b/g;
       r2 = c/g;
     }
-  else if ( b == 0 )
+  else if (b == 0)
     { 
       axis = 1;
       r1 = a/h;
       r2 = c/h;
     }
-  else if ( c == 0 ) 
+  else if (c == 0) 
     {
       axis = 2;
       r1 = a/j;
       r2 = b/j;
     }
 
-if ( 3 == axis ) 
+if (3 == axis) 
   {
     std::cout << "Could not find a negtaive coefficient. Error. Exiting..." << std::endl;
     exit(1);
   }
 
-
- double height = 10; //some arbitrarily large height
+//determine the size of the volume
+ double height = 1e3; //some arbitrarily large height
  double mag = sqrt(fabs(height/r1)); //value of the trace at that height
- height *= (r1 < 0) ? -1 : 1;
+ height *= (r1 < 0) ? -1 : 1; //sign adjustment
  
+
+ //create a vertex on the trace of the parabola at this point
  double p1[3] = {0,0,0};
  p1[(a == 0)] = -mag; //<-- didn't know you could do this
  p1[axis] = height;
  RefVertex* v1 = gmt->make_RefVertex(CubitVector(p1[0],p1[1],p1[2]));
  if (!v1) std::cout << "Failed to create the first vertex." << std::endl;
-   // //now a point at the top of the parabola
+
+ //create another vertex reflected across the rotation axis
  double pt2[3] = {0,0,0};
  pt2[(a == 0)] = mag; //<-- didn't know you could do this
  pt2[axis] = height;
@@ -450,63 +453,76 @@ if ( 3 == axis )
  RefVertex* v2 = gmt->make_RefVertex(CubitVector(pt2[0],pt2[1],pt2[2]));
  if (!v2) std::cout << "Failed to create the second vertex." << std::endl;
 
- double mid_pt[3] = {0,0,0}; //mid-point will always be the origin
- CubitVector mdpt(mid_pt[0],mid_pt[1],mid_pt[2]);
+ //mid-point will always be the origin
+ CubitVector mdpt(0,0,0);
  RefVertex* mv = gmt->make_RefVertex(mdpt);
+ if(!mv) std::cout << "Could not create vertex at the origin." << std::endl;
+ 
+ //we'll need a point above the origin at the height of the parabola
+ //to create bounding curves for the surface of rotation
+ double pt3_pos[3] = {0,0,0};
+ pt3_pos[axis] = height;
+ RefVertex* v3 = gmt->make_RefVertex(CubitVector(pt3_pos[0],pt3_pos[1],pt3_pos[2]));
+ if(!v3) std::cout << "Error creating the bounding curve vertex." << std::endl;
 
- double av_pt[3];
- av_pt[axis] = height;
+ //create a vertiical line from the origin to the height
+ RefEdge* line1 = gmt->make_RefEdge(STRAIGHT_CURVE_TYPE, v3, mv);
+ if(!line1) std::cout << "Error creating the vertical bounding cure." << std::endl;
 
- RefVertex* av = gmt->make_RefVertex(CubitVector(av_pt[0],av_pt[1],av_pt[2]));
-
- RefEdge* line1 = gmt->make_RefEdge(STRAIGHT_CURVE_TYPE, av, mv);
-
-
- RefEdge* line2 = gmt->make_RefEdge(STRAIGHT_CURVE_TYPE, av, v2);
+ //horizontal line to enclose the surface
+ RefEdge* line2 = gmt->make_RefEdge(STRAIGHT_CURVE_TYPE, v3, v2);
+ if(!line2) std::cout << "Error creating the horizontal bounding curve." << std::endl;
 
  //now create the parabolic curve 
-
- RefEdge* parab = gmt->make_RefEdge( PARABOLA_CURVE_TYPE, v1, v2, &mdpt);
+ RefEdge* parab = gmt->make_RefEdge(PARABOLA_CURVE_TYPE, v1, v2, &mdpt);
  if (!parab) std::cout << "Failed to create the parabolic curve." << std::endl;
 
  //trim the curve at the origin
  CubitStatus result = gmt->trim_curve(parab,mdpt,pt2_pos);
  if ( result != CUBIT_SUCCESS ) std::cout << "Could not trim the prabolic curve." << std::endl;
 
+ //gather the bounding curves to create the surface 
+ // note: trimmed curve is not parab curve
  DLIList<RefEdge*> bounding_curves;
- 
  gqt->ref_edges(bounding_curves);
+ 
+ //create the surface
+ RefFace* surf = gmt->make_RefFace(TORUS_SURFACE_TYPE, bounding_curves, true);
+ if (!surf) std::cout << "Error creating the surface of rotation." << std::endl;
 
- //create the other two curves needed to bound our surface
-
- RefFace* surf = gmt->make_RefFace( TORUS_SURFACE_TYPE, bounding_curves, true);
+ //prepare surface entity for sweep
  RefEntity* ent = dynamic_cast<RefEntity*>(surf);
  DLIList<RefEntity*> surf_to_sweep;
  surf_to_sweep.insert(ent);
- 
  DLIList<Body*> new_bodies;
  CubitVector sweep_point(0,0,0);
  double sweep_ax[3] = {0,0,0};
  sweep_ax[axis] = 1;
  CubitVector sweep_axis(sweep_ax[0],sweep_ax[1],sweep_ax[2]);
  
+ //sweep the surface about the axis of rotation
  result = gmt->sweep_rotational(surf_to_sweep, sweep_point, sweep_axis, 2*CUBIT_PI, new_bodies, CUBIT_FALSE, CUBIT_FALSE);
  if ( result != CUBIT_SUCCESS ) std::cout << "Failed to create the swept entity." << std::endl;
  
+ //need to get rid of the old surface reference
  gqt->delete_RefFace(surf);
  
- 
+ //make sure we got the correct number of volumes from the sweep
  assert( 1 == new_bodies.size() );
  
- CubitVector scale_pt(0,0,0);
- 
+ //perpare to scale the volume along the final axis
  double scale_factor = r2/r1;
+ CubitVector scale_pt(0,0,0); 
  std::cout << scale_factor << std::endl;
  double scale_factors[3] = {1,1,1};
  scale_factors[2-(c == 0)] = scale_factor;
- 
  CubitVector factors(scale_factors[0],scale_factors[1],scale_factors[2]);
  
- gmt->scale( new_bodies[0], scale_pt, factors);
+ //scale the volume 
+ result = gmt->scale( new_bodies[0], scale_pt, factors);
+ if (CUBIT_SUCCESS != result ) std::cout << "Error scaling the volume." << std::endl;
+
+ //all done
+ return;
  
 }
