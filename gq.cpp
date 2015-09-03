@@ -53,7 +53,7 @@ GeometryQueryTool *gqt = GeometryQueryTool::instance();
 
 
 void elliptic_cone(double a, double b, double c, double g, double h, double j, double k);
-void elliptic_paraboloid(double a, double b, double c, double k);
+void elliptic_paraboloid(double a, double b, double c, double g, double h, double j, double k);
 
 
 GQ_TYPE characterize_surf( double A,
@@ -235,7 +235,7 @@ GQ_TYPE characterize_surf( double A,
     }
   else if ( num_neg == 0 && num_zero == 1 && !rhs )
     {
-      elliptic_paraboloid( a, b, c, rhs );
+      elliptic_paraboloid( a, b, c, g, h, j, rhs );
       return ELLIPTIC_PARABOLOID;
     }
   else if ( num_neg == 1 && num_zero == 1 && !rhs )
@@ -399,12 +399,108 @@ void elliptic_cone( double a, double b, double c, double g, double h, double j, 
 
 }
 
-void elliptic_paraboloid( double a, double b, double c, double k )
+ void elliptic_paraboloid( double a, double b, double c, double g, double h, double j, double k )
 {
 
   //figure out which direction is zero
   
+  double height = 10; //arbitrarily large height for now
+  double r1,r2;
+  int axis = 3;
+  //figure out which direction is zero
+  if ( a == 0 ) 
+    {
+      axis = 0;
+      r1 = b/g;
+      r2 = c/g;
+    }
+  else if ( b == 0 )
+    { 
+      axis = 1;
+      r1 = a/h;
+      r2 = c/h;
+    }
+  else if ( c == 0 ) 
+    {
+      axis = 2;
+      r1 = a/j;
+      r2 = b/j;
+    }
+
+if ( 3 == axis ) 
+  {
+    std::cout << "Could not find a negtaive coefficient. Error. Exiting..." << std::endl;
+    exit(1);
+  }
 
 
+// //start by creating the profile of the minor axis
+
+ double p1[3] = {0,0,0};
+ p1[(a == 0)] = (1/r1)*4*4; //<-- didn't know you could do this
+ p1[axis] = -4;
+ RefVertex* v1 = gmt->make_RefVertex(CubitVector(p1[0],p1[1],p1[2]));
+ if (!v1) std::cout << "Failed to create the first vertex." << std::endl;
+   // //now a point at the top of the parabola
+ double pt2[3] = {0,0,0};
+ pt2[(a == 0)] = (1/r1)*4*4; //<-- didn't know you could do this
+ pt2[axis] = 4;
+ CubitVector pt2_pos(pt2[0],pt2[1],pt2[2]);
+ RefVertex* v2 = gmt->make_RefVertex(CubitVector(pt2[0],pt2[1],pt2[2]));
+ if (!v2) std::cout << "Failed to create the second vertex." << std::endl;
+
+ double mid_pt[3] = {0,0,0}; //mid-point will always be the origin
+ CubitVector mdpt(mid_pt[0],mid_pt[1],mid_pt[2]);
+ RefVertex* mv = gmt->make_RefVertex(mdpt);
+
+ double av_pt[3];
+ av_pt[(a == 0)] = -16;
+
+ RefVertex* av = gmt->make_RefVertex(CubitVector(av_pt[0],av_pt[1],av_pt[2]));
+
+ RefEdge* line1 = gmt->make_RefEdge(STRAIGHT_CURVE_TYPE, av, mv);
+
+
+ RefEdge* line2 = gmt->make_RefEdge(STRAIGHT_CURVE_TYPE, av, v2);
+
+ //now create the parabolic curve 
+
+ RefEdge* parab = gmt->make_RefEdge( PARABOLA_CURVE_TYPE, v1, v2, &mdpt);
+ if (!parab) std::cout << "Failed to create the parabolic curve." << std::endl;
+
+ //trim the curve at the origin
+ CubitStatus result = gmt->trim_curve(parab,mdpt,pt2_pos);
+ if ( result != CUBIT_SUCCESS ) std::cout << "Could not trim the prabolic curve." << std::endl;
+
+ DLIList<RefEdge*> bounding_curves;
+ 
+ gqt->ref_edges(bounding_curves);
+
+ //create the other two curves needed to bound our surface
+
+ RefFace* surf = gmt->make_RefFace( TORUS_SURFACE_TYPE, bounding_curves, true);
+ RefEntity* ent = dynamic_cast<RefEntity*>(surf);
+ DLIList<RefEntity*> surf_to_sweep;
+ surf_to_sweep.insert(ent);
+ 
+ DLIList<Body*> new_bodies;
+ CubitVector sweep_point(0,0,0);
+ double sweep_ax[3] = {1,0,0};
+ // sweep_ax[axis] = 1;
+ CubitVector sweep_axis(sweep_ax[0],sweep_ax[1],sweep_ax[2]);
+ 
+ result = gmt->sweep_rotational(surf_to_sweep, sweep_point, sweep_axis, 2*CUBIT_PI, new_bodies, CUBIT_FALSE, CUBIT_FALSE);
+   if ( result != CUBIT_SUCCESS ) std::cout << "Failed to create the swept entity." << std::endl;
+
+   gqt->delete_RefFace(surf);
+
+
+   assert( 1 == new_bodies.size() );
+
+   CubitVector scale_pt(0,0,0);
+
+   CubitVector factors(1,r1/r2,1);
+
+   gmt->scale( new_bodies[0], scale_pt, factors);
 
 }
