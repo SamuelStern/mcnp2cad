@@ -1,5 +1,3 @@
-
-
 #include "GeometryModifyTool.hpp"
 #include "GeometryQueryTool.hpp"
 #include "GMem.hpp"
@@ -27,6 +25,7 @@ enum GQ_TYPE {UNKNOWN = 0,
 
 std::ostream& operator<<(std::ostream& out, const GQ_TYPE value){
     static std::map<GQ_TYPE, std::string> strings;
+
     if (strings.size() == 0){
 #define INSERT_ELEMENT(p) strings[p] = #p
       INSERT_ELEMENT(UNKNOWN);
@@ -44,6 +43,13 @@ std::ostream& operator<<(std::ostream& out, const GQ_TYPE value){
     return out << strings[value];
 }
 
+#define CHECK_CUBIT(err,msg) \
+  do{ \
+if(CUBIT_SUCCESS != (err)) \
+  { \
+    std::cerr << "Cubit Error (" << err << "): " << msg << std::endl; \
+  } \
+}while(0) \
 
 //doing this globally for now to make function signatures easier to write
 CubitStatus stat = InitCGMA::initialize_cgma(); 
@@ -57,15 +63,15 @@ void elliptic_paraboloid(double a, double b, double c, double g, double h, doubl
 
 
 GQ_TYPE characterize_surf( double A,
-		       double B,
-		       double C, 
-		       double D, 
-		       double E,
-		       double F,
-		       double G, 
-		       double H, 
-		       double J,
-		       double K);
+			   double B,
+			   double C, 
+			   double D, 
+			   double E,
+			   double F,
+			   double G, 
+			   double H, 
+			   double J,
+			   double K);
 
 void complete_square ( double A,
 		       double B,
