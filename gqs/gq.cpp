@@ -145,7 +145,10 @@ GQ_TYPE characterize_surf( double A,
   else if ( num_neg == 1 && num_zero == 1 && !rhs )
     return HYPERBOLIC_PARABOLOID;
   else if ( num_neg == 0 && num_zero == 1 && rhs )
-    return ELLIPTIC_CYL;
+    {
+      elliptic_cyl(a,b,c,g,h,j,rhs);
+      return ELLIPTIC_CYL;
+    }
   else if ( num_neg == 1 && num_zero == 1 && rhs )
     return HYPERBOLIC_CYL;
   else if ( num_zero == 2 && !rhs )
@@ -429,4 +432,61 @@ if (3 == axis)
  //all done
  return;
  
+}
+
+
+void elliptic_cyl(double a, double b, double c, double g, double h, double j, double k)
+{
+
+  double r1,r2;
+  int axis = 3;
+  //figure out which direction is zero
+  if (a == 0) 
+    {
+      axis = 0;
+      r1 = c;
+      r2 = b;
+    }
+  else if (b == 0)
+    { 
+      axis = 1;
+      r1 = a;
+      r2 = c;
+    }
+  else if (c == 0) 
+    {
+      axis = 2;
+      r1 = a;
+      r2 = b;
+    }
+  
+  //use some arbitrary height for now
+  double height = 10;
+
+  //need a point on the origin to create the curve
+  CubitVector origin(0,0,0);
+
+  //create a surface from these points
+  double plane[3] = {0,0,0};
+  plane[axis] = 1;
+  CubitVector gen_ax(plane[0],plane[1],plane[2]);
+
+  CubitStatus result = gmt->create_ellipse_surface(r1,r2,gen_ax);
+  
+  //now get ready to sweep the ellipse along the generation axis
+  DLIList<RefFace*> surfs;
+  gqt->ref_faces(surfs);
+  assert(1 == surfs.size());
+
+  DLIList<RefEntity*> sweep_ents;
+  RefEntity* ent = dynamic_cast<RefEntity*>(surfs[0]);
+  sweep_ents.insert(ent);
+
+  DLIList<Body*> new_bodies;
+
+  result = gmt->sweep_translational(sweep_ents, height*gen_ax, 0, 0, CUBIT_FALSE, CUBIT_FALSE, CUBIT_TRUE, CUBIT_FALSE, new_bodies);
+
+  
+  
+  return;
 }
