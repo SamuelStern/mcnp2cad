@@ -403,8 +403,7 @@ void elliptic_cone( double a, double b, double c, double g, double h, double j, 
 {
 
   //figure out which direction is zero
-  
-  double height = 10; //arbitrarily large height for now
+ 
   double r1,r2;
   int axis = 3;
   //figure out which direction is zero
@@ -434,17 +433,18 @@ if ( 3 == axis )
   }
 
 
-// //start by creating the profile of the minor axis
-
+ double height = 10; //some arbitrarily large height
+ double mag = sqrt(fabs(height/r1)); //value of the trace at that height
+ 
  double p1[3] = {0,0,0};
- p1[(a == 0)] = -4; //<-- didn't know you could do this
- p1[axis] = (1/r1)*4*4;
+ p1[(a == 0)] = -mag; //<-- didn't know you could do this
+ p1[axis] = height;
  RefVertex* v1 = gmt->make_RefVertex(CubitVector(p1[0],p1[1],p1[2]));
  if (!v1) std::cout << "Failed to create the first vertex." << std::endl;
    // //now a point at the top of the parabola
  double pt2[3] = {0,0,0};
- pt2[(a == 0)] = 4; //<-- didn't know you could do this
- pt2[axis] = (1/r1)*4*4;
+ pt2[(a == 0)] = mag; //<-- didn't know you could do this
+ pt2[axis] = height;
  CubitVector pt2_pos(pt2[0],pt2[1],pt2[2]);
  RefVertex* v2 = gmt->make_RefVertex(CubitVector(pt2[0],pt2[1],pt2[2]));
  if (!v2) std::cout << "Failed to create the second vertex." << std::endl;
@@ -454,7 +454,7 @@ if ( 3 == axis )
  RefVertex* mv = gmt->make_RefVertex(mdpt);
 
  double av_pt[3];
- av_pt[axis] = -16;
+ av_pt[axis] = height;
 
  RefVertex* av = gmt->make_RefVertex(CubitVector(av_pt[0],av_pt[1],av_pt[2]));
 
@@ -486,21 +486,28 @@ if ( 3 == axis )
  DLIList<Body*> new_bodies;
  CubitVector sweep_point(0,0,0);
  double sweep_ax[3] = {0,0,1};
- // sweep_ax[axis] = 1;
  CubitVector sweep_axis(sweep_ax[0],sweep_ax[1],sweep_ax[2]);
  
  result = gmt->sweep_rotational(surf_to_sweep, sweep_point, sweep_axis, 2*CUBIT_PI, new_bodies, CUBIT_FALSE, CUBIT_FALSE);
-   if ( result != CUBIT_SUCCESS ) std::cout << "Failed to create the swept entity." << std::endl;
-
-   gqt->delete_RefFace(surf);
-
-
-   assert( 1 == new_bodies.size() );
-
-   CubitVector scale_pt(0,0,0);
-
-   CubitVector factors(1,r1/r2,1);
-
-   gmt->scale( new_bodies[0], scale_pt, factors);
-
+ if ( result != CUBIT_SUCCESS ) std::cout << "Failed to create the swept entity." << std::endl;
+ 
+ gqt->delete_RefFace(surf);
+ 
+ 
+ assert( 1 == new_bodies.size() );
+ 
+ CubitVector scale_pt(0,0,0);
+ 
+ double scale_factor = r2/r1;
+ std::cout << scale_factor << std::endl;
+ double scale_factors[3];
+ scale_factors[0] = 1;
+ scale_factors[1] = 1;
+ scale_factors[2] = 1;
+ scale_factors[2-(c == 0)] = scale_factor;
+ 
+ CubitVector factors(scale_factors[0],scale_factors[1],scale_factors[2]);
+ 
+ gmt->scale( new_bodies[0], scale_pt, factors);
+ 
 }
