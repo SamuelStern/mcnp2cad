@@ -127,7 +127,10 @@ GQ_TYPE characterize_surf( double A,
     }
 
   if ( num_neg == 0 && num_zero == 0 && rhs)
-    return ELLIPSOID;
+    {
+      //we already have a function for this
+      return ELLIPSOID;
+    }
   else if ( num_neg == 1 && num_zero == 0 && rhs )
     return ONE_SHEET_HYPERBOLOID;
   else if ( num_neg == 2 && num_zero == 0 && rhs )
