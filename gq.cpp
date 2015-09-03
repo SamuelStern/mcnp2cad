@@ -437,14 +437,14 @@ if ( 3 == axis )
 // //start by creating the profile of the minor axis
 
  double p1[3] = {0,0,0};
- p1[(a == 0)] = (1/r1)*4*4; //<-- didn't know you could do this
- p1[axis] = -4;
+ p1[(a == 0)] = -4; //<-- didn't know you could do this
+ p1[axis] = (1/r1)*4*4;
  RefVertex* v1 = gmt->make_RefVertex(CubitVector(p1[0],p1[1],p1[2]));
  if (!v1) std::cout << "Failed to create the first vertex." << std::endl;
    // //now a point at the top of the parabola
  double pt2[3] = {0,0,0};
- pt2[(a == 0)] = (1/r1)*4*4; //<-- didn't know you could do this
- pt2[axis] = 4;
+ pt2[(a == 0)] = 4; //<-- didn't know you could do this
+ pt2[axis] = (1/r1)*4*4;
  CubitVector pt2_pos(pt2[0],pt2[1],pt2[2]);
  RefVertex* v2 = gmt->make_RefVertex(CubitVector(pt2[0],pt2[1],pt2[2]));
  if (!v2) std::cout << "Failed to create the second vertex." << std::endl;
@@ -454,7 +454,7 @@ if ( 3 == axis )
  RefVertex* mv = gmt->make_RefVertex(mdpt);
 
  double av_pt[3];
- av_pt[(a == 0)] = -16;
+ av_pt[axis] = -16;
 
  RefVertex* av = gmt->make_RefVertex(CubitVector(av_pt[0],av_pt[1],av_pt[2]));
 
@@ -485,7 +485,7 @@ if ( 3 == axis )
  
  DLIList<Body*> new_bodies;
  CubitVector sweep_point(0,0,0);
- double sweep_ax[3] = {1,0,0};
+ double sweep_ax[3] = {0,0,1};
  // sweep_ax[axis] = 1;
  CubitVector sweep_axis(sweep_ax[0],sweep_ax[1],sweep_ax[2]);
  
