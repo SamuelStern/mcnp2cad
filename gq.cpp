@@ -52,7 +52,7 @@ GeometryModifyTool *gmt = GeometryModifyTool::instance();
 GeometryQueryTool *gqt = GeometryQueryTool::instance();
 
 
-void elliptic_cone(double a, double b, double c, double k);
+void elliptic_cone(double a, double b, double c, double g, double h, double j, double k);
 void elliptic_paraboloid(double a, double b, double c, double k);
 
 
@@ -213,6 +213,15 @@ GQ_TYPE characterize_surf( double A,
   if ( c == 0) num_zero++;
 
 
+  double g,h,j;
+  g = G; h = H; j = J;
+  if (W!=0)
+    {
+      g/=W;
+      h/=W;
+      j/=W;
+    }
+
   if ( num_neg == 0 && num_zero == 0 && rhs)
     return ELLIPSOID;
   else if ( num_neg == 1 && num_zero == 0 && rhs )
@@ -221,7 +230,7 @@ GQ_TYPE characterize_surf( double A,
     return TWO_SHEET_HYPERBOLOID;
   else if ( num_neg == 1 && num_zero == 0 && !rhs )
     {
-      elliptic_cone( a, b, c, rhs );
+      elliptic_cone( a, b, c, g, h, j, rhs );
       return ELLIPTIC_CONE;
     }
   else if ( num_neg == 0 && num_zero == 1 && !rhs )
@@ -309,7 +318,7 @@ void get_translation( double A,
 }
 
 
-void elliptic_cone( double a, double b, double c, double k )
+void elliptic_cone( double a, double b, double c, double g, double h, double j, double k )
 {
 
   //make sure that k is zero for this case
@@ -320,14 +329,14 @@ void elliptic_cone( double a, double b, double c, double k )
     }
 
   bool pre_rot;
-  double h,mnr,mjr;
-  h = 0;
+  double height,mnr,mjr;
+  height = 0;
 
   int axis = 3;
   //figure out which of the coefficients is negative and set params accordingly
   if ( a < 0 ) 
     {
-      h = sqrt(fabs(a));
+      height = sqrt(fabs(a));
       pre_rot = (b < c); // if the major axis is not along b, an extra rotation is needed
       mnr = pre_rot ? b : c;
       mjr = pre_rot ? c : b;
@@ -335,7 +344,7 @@ void elliptic_cone( double a, double b, double c, double k )
     }
   else if ( b < 0) 
     { 
-      h = sqrt(fabs(b));
+      height = sqrt(fabs(b));
       pre_rot = (a < c); // if the major axes is not along a, an extra rotation is needed
       mnr = pre_rot ? a : c;
       mjr = pre_rot ? c : a;
@@ -343,14 +352,14 @@ void elliptic_cone( double a, double b, double c, double k )
     }
   else if ( c < 0 ) 
     {
-      h = sqrt(fabs(c));
+      height = sqrt(fabs(c));
       pre_rot = (a < b); // if the minor axes it not along b, an extra rotation is needed
       mnr = pre_rot ? a : b;
       mjr = pre_rot ? b : a;
       axis = 2;
     }
  
-  if ( 0 == h || 3 == axis ) 
+  if ( 0 == height || 3 == axis ) 
     {
       std::cout << "Could not find a negtaive coefficient. Error. Exiting..." << std::endl;
       exit(1);
@@ -359,7 +368,7 @@ void elliptic_cone( double a, double b, double c, double k )
   CubitStatus result;
 
   //fortunately there is a direct cgm function for this
-  Body* ent = gmt->cylinder( h, mjr, mnr, 0);
+  Body* ent = gmt->cylinder( height, mjr, mnr, 0);
   
   //if the minor/major radii need to be switched, do it now
   if (pre_rot)
