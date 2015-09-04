@@ -22,12 +22,24 @@ int main()
   return 0;
 }
 
+/* Creates two hyperbolic curves in the xy plane using the parameters a & b
+
+Hyperbolic Curve Form:
+
+x^2/a - y^2/b = 1
+
+symmetric axis - x
+reflection axis - y
+
+Returns: two RefEdge pointers to the curves
+
+*/
 
 void hyperbolic_curve(double a, double b, DLIList<RefEdge*> &edge_list)
 {
 
   //first create a conic surface
-  CubitVector p1(0,0,b);
+  CubitVector p1(b,0,0);
   CubitVector p2(0,a,0);
 
   RefVertex* v1 = gmt->make_RefVertex(p1);
@@ -40,14 +52,15 @@ void hyperbolic_curve(double a, double b, DLIList<RefEdge*> &edge_list)
   ents_to_sweep.insert(line);
 
   DLIList<Body*> new_bodies;
-  gmt->sweep_rotational(ents_to_sweep, CubitVector(0,0,0), CubitVector(0,0,1), 2*CUBIT_PI, new_bodies, CUBIT_FALSE, CUBIT_FALSE);
+  gmt->sweep_rotational(ents_to_sweep, CubitVector(0,0,0), CubitVector(1,0,0), 2*CUBIT_PI, new_bodies, CUBIT_FALSE, CUBIT_FALSE);
 
 
-  //calculate the offset we want based on a&b
+  //calculate the offset we want based on a & b to give us a pure hyperbole
   double offset = a*a/b;
+
   //now create the plane
-  Body* plane = gmt->planar_sheet(CubitVector(offset,-a,-b),CubitVector(offset,-a,b),
-				  CubitVector(offset,a,b),CubitVector(offset,a,-b));
+  Body* plane = gmt->planar_sheet(CubitVector(-b,-a,offset),CubitVector(b,-a,offset),
+				  CubitVector(b,a,offset),CubitVector(-b,a,offset));
 
 
   DLIList<RefFace*> surfs;
@@ -63,8 +76,8 @@ void hyperbolic_curve(double a, double b, DLIList<RefEdge*> &edge_list)
   RefEdge *copy = gmt->make_RefEdge( edge_list[0], true);
 
   //now reflect this curve across the creation plane
-  CubitVector reflection_pt(0,0,b);
-  CubitVector reflection_ax(0,0,1);
+  CubitVector reflection_pt(b,0,0);
+  CubitVector reflection_ax(1,0,0);
 
   RefEntity* copy_ent = dynamic_cast<RefEntity*>(copy);
   DLIList<RefEntity*> ents_to_reflect, reflected_ents;
@@ -82,9 +95,7 @@ void hyperbolic_curve(double a, double b, DLIList<RefEdge*> &edge_list)
 
 /* this function will return hyperbolic curves in a plane of two principle axes
 
-Hyperbolic Curve Form:
 
-x^2/a - y^2/b = 1
 
 axis 1 (ax1) - axis of symmetry for one of the curves
 
@@ -97,7 +108,7 @@ void hyperbolic_curve_in_plane( double a, double b, int ax1, int ax2, DLIList<Re
 {
 
   //first create our curves in the yz plane
-  //symmetric axis - z
+  //symmetric axis - x
   //reflection axis - y
   hyperbolic_curve(a,b, edge_list);
 
