@@ -616,6 +616,63 @@ void hyperbolic_cyl(double a, double b, double c, double g, double h, double j, 
   
   hyperbolic_curves_in_plane(A,B,sym_ax,ref_ax,hyperbolic_curves);
 
+  RefEntity* edge1 = dynamic_cast<RefEntity*>(hyperbolic_curves[0]);
+
+  DLIList<RefEntity*> edge1_children;
+  
+  edge1->get_child_ref_entities(edge1_children);
+
+  //should just be the start and end vertices
+  assert(2 == edge1_children.size());
+
+  //now re-cast both as RefVertices
+  RefVertex* v1 = dynamic_cast<RefVertex*>(edge1_children[0]);
+  RefVertex* v2 = dynamic_cast<RefVertex*>(edge1_children[1]);
+
+  //and make a line to connect them
+  RefEdge *line1 = gmt->make_RefEdge(STRAIGHT_CURVE_TYPE,v1,v2);
+
+
+  //repeat for the other curve 
+
+  RefEntity* edge2 = dynamic_cast<RefEntity*>(hyperbolic_curves[1]);
+
+  DLIList<RefEntity*> edge2_children;
+  
+  edge2->get_child_ref_entities(edge2_children);
+
+  //should just be the start and end vertices
+  assert(2 == edge2_children.size());
+
+  //now re-cast both as RefVertices
+  v1 = dynamic_cast<RefVertex*>(edge2_children[0]);
+  v2 = dynamic_cast<RefVertex*>(edge2_children[1]);
+
+  //and make a line to connect them
+  RefEdge *line2 = gmt->make_RefEdge(STRAIGHT_CURVE_TYPE,v1,v2);
+
+  //now create surfaces from the bounding curves 
+
+  DLIList<RefEdge*> face1_edges;
+  face1_edges.insert(hyperbolic_curves[0]);
+  face1_edges.insert(line1);
+
+  RefFace* face1 = gmt->make_RefFace(TORUS_SURFACE_TYPE, face1_edges, true );
+
+
+  DLIList<RefEdge*> face2_edges;
+  face2_edges.insert(hyperbolic_curves[1]);
+  face2_edges.insert(line2);
+
+  RefFace* face2 = gmt->make_RefFace(TORUS_SURFACE_TYPE, face2_edges, true );
+
+
+  //recast RefFaces as RefEntities for sweep
+  DLIList<RefEntity*> hc_ents;
+  hc_ents.insert(dynamic_cast<RefEntity*>(face1));
+  hc_ents.insert(dynamic_cast<RefEntity*>(face2));
+
+
   //now that we have the curves, just extrude them some height in the right direction
   double height = 10; //arb height
 
@@ -626,17 +683,12 @@ void hyperbolic_cyl(double a, double b, double c, double g, double h, double j, 
 
   CubitVector sweep_vec = CubitVector(axis1[0],axis1[1],axis1[2])*CubitVector(axis2[0],axis2[1],axis2[2]);
 
-
-  //recast RefEdges as RefEntities for sweep
-  DLIList<RefEntity*> hc_ents;
-  hc_ents.insert(dynamic_cast<RefEntity*>(hyperbolic_curves[0]));
-  hc_ents.insert(dynamic_cast<RefEntity*>(hyperbolic_curves[1]));
-
   DLIList<Body*> new_bodies;
 
   CubitStatus result = gmt->sweep_translational( hc_ents, sweep_vec, 0, 0, CUBIT_FALSE, CUBIT_FALSE, CUBIT_FALSE, CUBIT_FALSE, new_bodies);
 
 
+  
 
 }
 
