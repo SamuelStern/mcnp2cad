@@ -3,18 +3,27 @@
 
 
 
-void hyperbolic_curve(double a, double b);
+void hyperbolic_curve(double a, double b, DLIList<RefEdge*> &edge_list);
 
 int main()
 {
 
-  hyperbolic_curve(3,5);
+  DLIList<RefEdge*> curves;
+  hyperbolic_curve(3,5, curves);
+
+  //should be created by now, time to export
+  DLIList<RefEntity*> exp_bodies;
+  int exp_ents;
+  CubitString cubit_version("12.2");
+  
+  CubitCompat_export_solid_model(exp_bodies, "Hyperbola.sat", "ACIS_SAT", exp_ents, cubit_version);
+
 
   return 0;
 }
 
 
-void hyperbolic_curve(double a, double b)
+void hyperbolic_curve(double a, double b, DLIList<RefEdge*> &edge_list)
 {
 
   //first create a conic surface
@@ -43,7 +52,6 @@ void hyperbolic_curve(double a, double b)
 
   DLIList<RefFace*> surfs;
   gqt->ref_faces(surfs);
-  DLIList<RefEdge*> edge_list;
 
   gmt->surface_intersection(surfs[0],surfs[1],edge_list);
 
@@ -51,15 +59,47 @@ void hyperbolic_curve(double a, double b)
   gqt->delete_single_Body(new_bodies[0]);
   gqt->delete_single_Body(plane);
 
-    //should be created by now, time to export
-  DLIList<RefEntity*> exp_bodies;
-  int exp_ents;
-  CubitString cubit_version("12.2");
+  //make a copy of the first curve
+  RefEdge *copy = gmt->make_RefEdge( edge_list[0], true);
+
+  //now reflect this curve across the creation plane
+  CubitVector reflection_pt(0,0,b);
+  CubitVector reflection_ax(0,0,1);
+
+  RefEntity* copy_ent = dynamic_cast<RefEntity*>(copy);
+  DLIList<RefEntity*> ents_to_reflect, reflected_ents;
+  ents_to_reflect.insert(copy_ent);
+
+  gqt->reflect(ents_to_reflect, reflection_pt, reflection_ax, true, reflected_ents);
   
-  CubitCompat_export_solid_model(exp_bodies, "Hyperbola.sat", "ACIS_SAT", exp_ents, cubit_version);
-
-
+  //add the reflected curve to the output list
+  edge_list.insert(copy);
+  
   //now create a curve from the resulting 
 
   return;
+}
+
+/* this function will return hyperbolic curves in a plane of two principle axes
+
+Hyperbolic Curve Form:
+
+x^2/a - y^2/b = 1
+
+axis 1 (ax1) - axis of symmetry for one of the curves
+
+axis 2 (ax1) - reflecting axis for the curves
+
+(for the axes arguments: 0 is x, 1 is y, 2 is z
+
+*/
+void hyperbolic_curve_in_plane( double a, double b, int ax1, int ax2, DLIList<RefEdge*> &edge_list)
+{
+
+  //first create our curves in the yz plane
+  //symmetric axis - z
+  //reflection axis - y
+  hyperbolic_curve(a,b, edge_list);
+
+
 }
