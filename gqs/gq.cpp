@@ -1,7 +1,7 @@
 
 #include "moab/ProgOptions.hpp"
 #include "gq.hpp"
-
+#include "hyperbola.hpp"
 /*
  Desription: Program for the creation of a Generalized Quadratic (GQ) surface using CGM
 
@@ -153,7 +153,10 @@ GQ_TYPE characterize_surf( double A,
       return ELLIPTIC_CYL;
     }
   else if ( num_neg == 1 && num_zero == 1 && rhs )
-    return HYPERBOLIC_CYL;
+    {
+      hyperbolic_cyl(a,b,c,g,h,j,rhs);
+      return HYPERBOLIC_CYL;
+    }
   else if ( num_zero == 2 && !rhs )
     {
       parabolic_cyl(a,b,c,g,h,j,rhs);
@@ -581,26 +584,62 @@ void parabolic_cyl(double a, double b, double c, double g, double h, double j, d
   return;
 }
 
-#include "hyperbola.hpp"
-
-//saving this for future use
-void test_hyperbola()
+void hyperbolic_cyl(double a, double b, double c, double g, double h, double j, double k)
 {
-
-  DLIList<RefEdge*> curves;
-  hyperbolic_curves_in_plane(3,5,2,0,curves);
-
-
-  //should be created by now, time to export
-  DLIList<RefEntity*> exp_bodies;
-  int exp_ents;
-  CubitString cubit_version("12.2");
   
-  CubitCompat_export_solid_model(exp_bodies, "Hyperbola.sat", "ACIS_SAT", exp_ents, cubit_version);
+  double A,B;
+  int sym_ax,ref_ax;
+  //find the zero coefficient
+  if (a == 0) 
+    {
+      A = ( b < 0 ) ? c : b;
+      B = ( b < 0 ) ? b : c;
+      sym_ax  = ( b < 0 ) ? 2 : 1;
+      ref_ax = ( b < 0 ) ? 1 : 2;
+    }
+  else if (b == 0)
+    { 
+      A = ( a < 0 ) ? c : a;
+      B = ( a < 0 ) ? a : c;
+      sym_ax  = ( a < 0 ) ? 2 : 0;
+      ref_ax = ( a < 0 ) ? 0 : 2;
+    }
+  else if (c == 0) 
+    {
+      A = ( a < 0 ) ? b : a;
+      B = ( a < 0 ) ? a : b;
+      sym_ax  = ( a < 0 ) ? 1 : 0;
+      ref_ax = ( a < 0 ) ? 0 : 1;
+    }
+
+  DLIList<RefEdge*> hyperbolic_curves;
+  
+  hyperbolic_curves_in_plane(A,B,sym_ax,ref_ax,hyperbolic_curves);
+
+  //now that we have the curves, just extrude them some height in the right direction
+  double height = 10; //arb height
+
+  double axis1[3] = {0,0,0};
+  double axis2[3] = {0,0,0};
+  axis1[ref_ax] = 1;
+  axis2[sym_ax] = 1;
+
+  CubitVector sweep_vec = CubitVector(axis1[0],axis1[1],axis1[2])*CubitVector(axis2[0],axis2[1],axis2[2]);
 
 
-  return;
+  //recast RefEdges as RefEntities for sweep
+  DLIList<RefEntity*> hc_ents;
+  hc_ents.insert(dynamic_cast<RefEntity*>(hyperbolic_curves[0]));
+  hc_ents.insert(dynamic_cast<RefEntity*>(hyperbolic_curves[1]));
+
+  DLIList<Body*> new_bodies;
+
+  CubitStatus result = gmt->sweep_translational( hc_ents, sweep_vec, 0, 0, CUBIT_FALSE, CUBIT_FALSE, CUBIT_FALSE, CUBIT_FALSE, new_bodies);
+
+
+
 }
+
 
 /* Creates two hyperbolic curves in the xy plane using the parameters a & b
 
