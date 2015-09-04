@@ -3,13 +3,13 @@
 
 
 
-void hyperbolic_curve(double a, double b, DLIList<RefEdge*> &edge_list);
+void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list);
 
 int main()
 {
 
   DLIList<RefEdge*> curves;
-  hyperbolic_curve(3,5, curves);
+  hyperbolic_curves(3,5, curves);
 
   //should be created by now, time to export
   DLIList<RefEntity*> exp_bodies;
@@ -35,7 +35,7 @@ Returns: two RefEdge pointers to the curves
 
 */
 
-void hyperbolic_curve(double a, double b, DLIList<RefEdge*> &edge_list)
+void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list)
 {
 
   //first create a conic surface
@@ -104,13 +104,13 @@ axis 2 (ax1) - reflecting axis for the curves
 (for the axes arguments: 0 is x, 1 is y, 2 is z
 
 */
-void hyperbolic_curve_in_plane( double a, double b, int ax1, int ax2, DLIList<RefEdge*> &edge_list)
+void hyperbolic_curves_in_plane( double a, double b, int ax1, int ax2, DLIList<RefEdge*> &edge_list)
 {
 
   //first create our curves in the yz plane
   //symmetric axis - x
   //reflection axis - y
-  hyperbolic_curve(a,b, edge_list);
+  hyperbolic_curves(a,b, edge_list);
 
 
 }
