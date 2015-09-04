@@ -1,12 +1,9 @@
 
 #include "gq.hpp"
+#include "hyperbola.hpp"
 
-
-
-void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list);
-void hyperbolic_curves_in_plane( double a, double b, int ax1, int ax2, DLIList<RefEdge*> &edge_list);
-
-int main()
+//saving this for future use
+void test_hyperbola()
 {
 
   DLIList<RefEdge*> curves;
@@ -21,7 +18,7 @@ int main()
   CubitCompat_export_solid_model(exp_bodies, "Hyperbola.sat", "ACIS_SAT", exp_ents, cubit_version);
 
 
-  return 0;
+  return;
 }
 
 /* Creates two hyperbolic curves in the xy plane using the parameters a & b
