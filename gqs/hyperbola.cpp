@@ -3,22 +3,19 @@
 
 
 
-void hyperbolic_curve();
+void hyperbolic_curve(double a, double b);
 
 int main()
 {
 
-  hyperbolic_curve();
+  hyperbolic_curve(3,5);
 
   return 0;
 }
 
 
-void hyperbolic_curve()
+void hyperbolic_curve(double a, double b)
 {
-
-  double a = 3;
-  double b = 5;
 
   //first create a conic surface
   CubitVector p1(0,0,b);
