@@ -685,7 +685,7 @@ void hyperbolic_cyl(double a, double b, double c, double g, double h, double j, 
 
   DLIList<Body*> new_bodies;
 
-  CubitStatus result = gmt->sweep_translational( hc_ents, sweep_vec, 0, 0, CUBIT_FALSE, CUBIT_FALSE, CUBIT_FALSE, CUBIT_FALSE, new_bodies);
+  CubitStatus result = gmt->sweep_translational( hc_ents, height*sweep_vec, 0, 0, CUBIT_FALSE, CUBIT_FALSE, CUBIT_FALSE, CUBIT_FALSE, new_bodies);
 
 
   
@@ -739,6 +739,13 @@ void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list)
 
   gmt->surface_intersection(surfs[0],surfs[1],edge_list);
 
+  //need to move this back to the axis
+  assert( 1 == edge_list.size() );
+
+  DLIList<RefEntity*> ents_to_translate, ents_translated;
+  ents_to_translate.insert(dynamic_cast<RefEntity*>(edge_list[0]));
+
+  gqt->translate(ents_to_translate, 0, 0, -offset, true, ents_translated, false);
 
   gqt->delete_single_Body(new_bodies[0]);
   gqt->delete_single_Body(plane);
