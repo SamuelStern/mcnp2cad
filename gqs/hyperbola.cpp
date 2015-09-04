@@ -4,12 +4,14 @@
 
 
 void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list);
+void hyperbolic_curves_in_plane( double a, double b, int ax1, int ax2, DLIList<RefEdge*> &edge_list);
 
 int main()
 {
 
   DLIList<RefEdge*> curves;
-  hyperbolic_curves(3,5, curves);
+  hyperbolic_curves_in_plane(3,5,2,0,curves);
+
 
   //should be created by now, time to export
   DLIList<RefEntity*> exp_bodies;
@@ -99,7 +101,7 @@ void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list)
 
 axis 1 (ax1) - axis of symmetry for one of the curves
 
-axis 2 (ax1) - reflecting axis for the curves
+axis 2 (ax2) - reflecting axis for the curves
 
 (for the axes arguments: 0 is x, 1 is y, 2 is z
 
@@ -112,5 +114,55 @@ void hyperbolic_curves_in_plane( double a, double b, int ax1, int ax2, DLIList<R
   //reflection axis - y
   hyperbolic_curves(a,b, edge_list);
 
+  //get the curves as RefEntities
+  DLIList<RefEntity*> edge_ent_list;
+  if ( 2 == edge_list.size() )
+    {
+      edge_ent_list.insert(dynamic_cast<RefEntity*>(edge_list[0]));
+      edge_ent_list.insert(dynamic_cast<RefEntity*>(edge_list[1]));
+    }
+  else
+      std::cout << "Expected two curves. Leaving function without action..." << std::endl;
+
+  //make sure our axes aren't the same
+  if ( ax1 == ax2 )
+    {
+      std::cout << "Axes do not define a proper plane. Leaving function without action..." << std::endl;
+      return;
+    }
+
+
+  //for tracking the symmetric axis during the first rotation
+  int sym_axis = 0;
+
+  //rotate the reflection axis to match the one requested
+  if ( ax2 != 1 ) //if this is already the y axis, skip
+    {
+      //setup the rotation axis
+      double ax[3] = {0,0,0};
+      ax[( 2 == ax2 ) ? 0 : 2] = 1;
+      double degrees = 90;
+
+      DLIList<RefEntity*> ents_rotated;
+      gqt->rotate(edge_ent_list, CubitVector(0,0,0), CubitVector(ax[0],ax[1],ax[2]), degrees, true, ents_rotated, false);
+
+      //the symmetric axis may have changed base on this rotation
+      if( ax[2] != 0 ) //if we rotated around the z-axis, the symm axis changed
+	sym_axis++;
+    }
+
+  //if the symmetric axis is incorrect, rotate around reflecting axis
+  if ( sym_axis != ax1 )
+    {
+
+      //setup the rotation axis
+      double ax[3] = {0,0,0};
+      ax[ax2] = 1;
+      double degrees = 90;
+
+      DLIList<RefEntity*> ents_rotated;
+      gqt->rotate(edge_ent_list, CubitVector(0,0,0), CubitVector(ax[0],ax[1],ax[2]), degrees, true, ents_rotated, false);
+
+    }
 
 }
