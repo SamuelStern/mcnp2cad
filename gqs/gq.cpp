@@ -755,6 +755,17 @@ void one_sheet_hyperboloid(double a, double b, double c, double g, double h, dou
   
   gmt->sweep_rotational(ents_to_sweep, origin, sweep_ax, 2*CUBIT_PI, new_bodies, CUBIT_FALSE, CUBIT_FALSE, 0, 0, 0, CUBIT_FALSE, CUBIT_TRUE);
 
+
+  assert(1 == new_bodies.size());
+
+  double sf[3] = {1,1,1};
+  sf[(c < 0) ? 1 : 2] = scale_factor;
+  
+  CubitVector scale_ax(sf[0],sf[1],sf[2]);
+
+  gqt->scale(new_bodies[0], origin, scale_ax, true, false);
+  
+  
   return;
 }
 			   
