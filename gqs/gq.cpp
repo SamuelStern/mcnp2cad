@@ -1,7 +1,6 @@
 
 #include "moab/ProgOptions.hpp"
 #include "gq.hpp"
-#include "hyperbola.hpp"
 /*
  Desription: Program for the creation of a Generalized Quadratic (GQ) surface using CGM
 
@@ -132,7 +131,10 @@ GQ_TYPE characterize_surf( double A,
       return ELLIPSOID;
     }
   else if ( num_neg == 1 && num_zero == 0 && rhs )
-    return ONE_SHEET_HYPERBOLOID;
+    {
+      one_sheet_hyperboloid( a, b, c, g, h, j, rhs );
+      return ONE_SHEET_HYPERBOLOID;
+    }
   else if ( num_neg == 2 && num_zero == 0 && rhs )
     return TWO_SHEET_HYPERBOLOID;
   else if ( num_neg == 1 && num_zero == 0 && !rhs )
@@ -687,11 +689,143 @@ void hyperbolic_cyl(double a, double b, double c, double g, double h, double j, 
 
   CubitStatus result = gmt->sweep_translational( hc_ents, height*sweep_vec, 0, 0, CUBIT_FALSE, CUBIT_FALSE, CUBIT_FALSE, CUBIT_FALSE, new_bodies);
 
-
-  
-
 }
 
+
+void one_sheet_hyperboloid(double a, double b, double c, double g, double h, double j, double k)
+{
+
+
+  double A,B, scale_factor;;
+  int sym_ax,ref_ax;
+  //find the negative coefficient
+  if (a < 0) 
+    {
+      A = b;
+      B = a;
+      scale_factor = c/b;
+      sym_ax  = 1;
+      ref_ax = 0;
+    }
+  else if (b < 0)
+    { 
+      A = a;
+      B = b;
+      scale_factor = c/a;
+      sym_ax  = 0;
+      ref_ax = 1;
+    }
+  else if (c < 0) 
+    {
+      A = a;
+      B = c;
+      scale_factor = b/a;
+      sym_ax  = 0;
+      ref_ax = 2;
+    }
+
+  DLIList<RefEdge*> hyperbolic_curves;
+
+
+  std::cout << A << std::endl;
+  std::cout << B << std::endl;
+  std::cout << sym_ax << std::endl;
+  std::cout << ref_ax << std::endl;
+  
+  hyperbolic_curves_in_plane(A,B,sym_ax,ref_ax,hyperbolic_curves);
+
+  //remove the sedond curve, no need for it w/ this surface
+  gqt->delete_RefEdge(hyperbolic_curves[1]);
+  
+  RefEntity* edge1 = dynamic_cast<RefEntity*>(hyperbolic_curves[0]);
+  
+  DLIList<RefEntity*> edge1_children;
+  
+  edge1->get_child_ref_entities(edge1_children);
+
+  //should just be the start and end vertices
+  std::cout << edge1_children.size() << std::endl;
+  //  assert(2 == edge1_children.size());
+
+  //now re-cast both as RefVertices
+  RefVertex* v1 = dynamic_cast<RefVertex*>(edge1_children[0]);
+  RefVertex* v2 = dynamic_cast<RefVertex*>(edge1_children[1]);
+
+
+  //close a contour along the reflection axis
+  CubitVector start_point = v1->coordinates();
+  CubitVector end_point = v2->coordinates();
+
+  //start point on axis
+  double upper_point[3] = {0,0,0};
+  upper_point[ref_ax] = start_point[ref_ax];
+  CubitVector upper_point_vec(upper_point[0],upper_point[1],upper_point[2]);
+  RefVertex *uv = gmt->make_RefVertex(upper_point_vec);
+
+  //end point on axis
+  double lower_point[3] = {0,0,0};
+  lower_point[ref_ax] = end_point[ref_ax];
+  CubitVector lower_point_vec(lower_point[0],lower_point[1],lower_point[2]);
+  RefVertex *lv = gmt->make_RefVertex(lower_point_vec);
+
+  //line between these two vertcies
+  RefEdge *ax_line = gmt->make_RefEdge(STRAIGHT_CURVE_TYPE, uv, lv);
+
+  //connect the start of the curve to the reflection axis point
+  RefEdge *strt_2_ax = gmt->make_RefEdge(STRAIGHT_CURVE_TYPE, v1, uv);
+
+  //connect the end of the curve to the reflection axis point
+  RefEdge *end_2_ax = gmt->make_RefEdge(STRAIGHT_CURVE_TYPE, v2, lv);
+
+  DLIList<RefEdge*> edges;
+  edges.insert(hyperbolic_curves[0]);
+  edges.insert(ax_line);
+  edges.insert(strt_2_ax);
+  edges.insert(end_2_ax);
+  
+  // //now close this contour into a surface
+  // RefFace* surf = gmt->make_RefFace( TORUS_SURFACE_TYPE, edges, true);
+
+  // RefEntity* surf_ent = dynamic_cast<RefEntity*>(surf);
+  // DLIList<RefEntity*> ents_to_sweep;
+  // ents_to_sweep.insert(surf_ent);
+
+  DLIList<RefEntity*> ents_to_sweep;
+  ents_to_sweep.insert(dynamic_cast<RefEntity*>(hyperbolic_curves[0]));
+  //ents_to_sweep.insert(dynamic_cast<RefEntity*>(strt_2_ax));
+  //ents_to_sweep.insert(dynamic_cast<RefEntity*>(end_2_ax));
+  
+  //finally, sweep this surface around the reflection axis
+  CubitVector origin(0,0,0);
+  double sweep_ax[3] = {0,0,0};
+  sweep_ax[ref_ax] = 1;
+  CubitVector sweep_axis(sweep_ax[0], sweep_ax[1], sweep_axis[2]);
+  DLIList<Body*> new_bodies;
+  
+  gmt->sweep_rotational(ents_to_sweep, origin, sweep_ax, 2*CUBIT_PI, new_bodies, CUBIT_FALSE, CUBIT_FALSE, 0, 0, 0, CUBIT_FALSE, CUBIT_TRUE);
+
+  // DLIList<RefVolume*> sweep_vols;
+  
+  // for(unsigned int i=0; i < new_bodies.size() ; i++)
+  //   {
+  //     Body* this_bod = new_bodies[i];
+  //     //get the RefVolume for this Body
+  //     RefEntity* bod_ptr = dynamic_cast<RefEntity*>(this_bod);
+  //     DLIList<RefEntity*> child_ents;
+  //     this_bod->get_child_ref_entities(child_ents);
+  //     if ( 1 == child_ents.size() && 3 == child_ents[0]->dimension() )
+  // 	{
+  // 	  RefVolume* vol = dynamic_cast<RefVolume*>(child_ents[0]);
+  // 	  sweep_vols.insert(vol);
+  // 	}
+
+  //   }
+
+  // std::cout << sweep_vols.size() << std::endl;
+  
+  return;
+}
+			   
 
 /* Creates two hyperbolic curves in the xy plane using the parameters a & b
 
@@ -745,7 +879,7 @@ void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list)
   DLIList<RefEntity*> ents_to_translate, ents_translated;
   ents_to_translate.insert(dynamic_cast<RefEntity*>(edge_list[0]));
 
-  gqt->translate(ents_to_translate, 0, 0, -offset, true, ents_translated, false);
+  gqt->translate(ents_to_translate, -b, 0, -offset, true, ents_translated, false);
 
   gqt->delete_single_Body(new_bodies[0]);
   gqt->delete_single_Body(plane);
