@@ -1,7 +1,7 @@
 
 
 
-#include "moab/ProgOptions.hpp"
+#include "ProgOptions.hpp"
 #include "gq.hpp"
 
 std::ostream& operator<<(std::ostream& out, const GQ_TYPE value){
