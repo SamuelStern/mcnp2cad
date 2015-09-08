@@ -9,12 +9,6 @@
 #include "InitCGMA.hpp"
 #include "CubitCompat.hpp"
 
-//doing this globally for now to make function signatures easier to write
-CubitStatus stat = InitCGMA::initialize_cgma(); 
-
-GeometryModifyTool *gmt = GeometryModifyTool::instance();
-GeometryQueryTool *gqt = GeometryQueryTool::instance();
-
 
 enum GQ_TYPE {UNKNOWN = 0,
 	      ELLIPSOID,
@@ -27,25 +21,6 @@ enum GQ_TYPE {UNKNOWN = 0,
 	      HYPERBOLIC_CYL,
 	      PARABOLIC_CYL};
 
-
-std::ostream& operator<<(std::ostream& out, const GQ_TYPE value){
-    static std::map<GQ_TYPE, std::string> strings;
-    if (strings.size() == 0){
-#define INSERT_ELEMENT(p) strings[p] = #p
-      INSERT_ELEMENT(UNKNOWN);
-      INSERT_ELEMENT(ELLIPSOID);
-      INSERT_ELEMENT(ONE_SHEET_HYPERBOLOID);
-      INSERT_ELEMENT(TWO_SHEET_HYPERBOLOID);
-      INSERT_ELEMENT(ELLIPTIC_CONE);
-      INSERT_ELEMENT(ELLIPTIC_PARABOLOID);
-      INSERT_ELEMENT(HYPERBOLIC_PARABOLOID);
-      INSERT_ELEMENT(ELLIPTIC_CYL);
-      INSERT_ELEMENT(HYPERBOLIC_CYL);
-      INSERT_ELEMENT(PARABOLIC_CYL);
-#undef INSERT_ELEMENT
-    }   
-    return out << strings[value];
-}
 
 
 void elliptic_cone(double a, double b, double c, double g, double h, double j, double k);

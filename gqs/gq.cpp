@@ -1,76 +1,97 @@
 
-#include "moab/ProgOptions.hpp"
+// #include "moab/ProgOptions.hpp"
+#include "GeometryModifyTool.hpp"
+#include "GeometryQueryTool.hpp"
+#include "GMem.hpp"
+#include "RefVertex.hpp"
+#include "RefEdge.hpp"
+#include "RefFace.hpp"
+#include "RefVolume.hpp"
+#include "Surface.hpp"
+#include "InitCGMA.hpp"
+#include "CubitCompat.hpp"
 #include "gq.hpp"
-/*
- Desription: Program for the creation of a Generalized Quadratic (GQ) surface using CGM
 
- Input: 10 double values indicating the coefficients (A,B,C,D,E,F,G,H,J,K) to be used in defining the GQ equation as follows:
+//doing this globally for now to make function signatures easier to write
+CubitStatus stat = InitCGMA::initialize_cgma(); 
 
- Ax^2 + By^2 + Cz^2 + Dxy + Eyx + Fzx + Gz + Hy + Jz + K = 0
+GeometryModifyTool *gmt = GeometryModifyTool::instance();
+GeometryQueryTool *gqt = GeometryQueryTool::instance();
 
- Output: .sat file containing the described GQ surface.
-*/
-int main ( int argc, char** argv ) {
+// /*
+//  Desription: Program for the creation of a Generalized Quadratic (GQ) surface using CGM
 
-  double A,B,C,D,E,F,G,H,J,K;
-  std::string filename = "GQ.sat";
+//  Input: 10 double values indicating the coefficients (A,B,C,D,E,F,G,H,J,K) to be used in defining the GQ equation as follows:
 
-  ProgOptions po( "GQ: A program for generating generalized quadratic surfaces in CGM.");
+//  Ax^2 + By^2 + Cz^2 + Dxy + Eyx + Fzx + Gz + Hy + Jz + K = 0
 
-  po.addRequiredArg<double>("A", "x-squared coefficient", &A);
-  po.addRequiredArg<double>("B", "y-squared coefficient", &B);
-  po.addRequiredArg<double>("C", "z-squared coefficient", &C);
-  po.addRequiredArg<double>("D", "xy coefficient", &D);
-  po.addRequiredArg<double>("E", "yz coefficient", &E);
-  po.addRequiredArg<double>("F", "xz coefficient", &F);
-  po.addRequiredArg<double>("G", "x coefficient", &G);
-  po.addRequiredArg<double>("H", "y coefficient", &H);
-  po.addRequiredArg<double>("J", "z coefficient", &J);
-  po.addRequiredArg<double>("K", "offset", &K);
+//  Output: .sat file containing the described GQ surface.
+// */
+// int main ( int argc, char** argv ) {
 
-  po.addOpt<std::string>("o", "Sat File", &filename);
+//   double A,B,C,D,E,F,G,H,J,K;
+//   std::string filename = "GQ.sat";
 
-  po.parseCommandLine( argc, argv );
+//   ProgOptions po( "GQ: A program for generating generalized quadratic surfaces in CGM.");
 
-  //make sure this is actually a quadratic surface
-  if ( A == 0 && B == 0 && C == 0 )
-    {
-      std::cout << "All 2nd order coeffs are zero. This is not a GQ. Exiting..." << std::endl;
-      return 1;
-    }
+//   po.addRequiredArg<double>("A", "x-squared coefficient", &A);
+//   po.addRequiredArg<double>("B", "y-squared coefficient", &B);
+//   po.addRequiredArg<double>("C", "z-squared coefficient", &C);
+//   po.addRequiredArg<double>("D", "xy coefficient", &D);
+//   po.addRequiredArg<double>("E", "yz coefficient", &E);
+//   po.addRequiredArg<double>("F", "xz coefficient", &F);
+//   po.addRequiredArg<double>("G", "x coefficient", &G);
+//   po.addRequiredArg<double>("H", "y coefficient", &H);
+//   po.addRequiredArg<double>("J", "z coefficient", &J);
+//   po.addRequiredArg<double>("K", "offset", &K);
 
-  //let's rule out rotations (for now)
-  if ( D != 0 || E != 0 || F !=0 )
-    {
-      std::cout << "Rotations are unsupported right now." << std::endl;
-      return 1;
-    }
+//   po.addOpt<std::string>("o", "Sat File", &filename);
 
-  //The first step is to characterize the surface
-  GQ_TYPE type = characterize_surf(A,B,C,D,E,F,G,H,J,K);
+//   po.parseCommandLine( argc, argv );
 
-  if (!type)
-    {
-      std::cout << "This GQ type is not yet supported. Exiting..." << std::endl;
-      return 1;
-    }
+//   //make sure this is actually a quadratic surface
+//   if ( A == 0 && B == 0 && C == 0 )
+//     {
+//       std::cout << "All 2nd order coeffs are zero. This is not a GQ. Exiting..." << std::endl;
+//       return 1;
+//     }
 
-  std::cout << "This GQ has type: " << type << std::endl; 
+//   //let's rule out rotations (for now)
+//   if ( D != 0 || E != 0 || F !=0 )
+//     {
+//       std::cout << "Rotations are unsupported right now." << std::endl;
+//       return 1;
+//     }
 
-  //should be created by now, time to export
-  DLIList<RefEntity*> exp_bodies;
-  int exp_ents;
-  CubitString cubit_version("12.2");
+//   //The first step is to characterize the surface
+//   GQ_TYPE type = characterize_surf(A,B,C,D,E,F,G,H,J,K);
+
+//   if (!type)
+//     {
+//       std::cout << "This GQ type is not yet supported. Exiting..." << std::endl;
+//       return 1;
+//     }
+
+//   std::cout << "This GQ has type: " << type << std::endl; 
+
+//   //should be created by now, time to export
+//   DLIList<RefEntity*> exp_bodies;
+//   int exp_ents;
+//   CubitString cubit_version("12.2");
   
-  CubitCompat_export_solid_model(exp_bodies, filename.c_str(), "ACIS_SAT", exp_ents, cubit_version);
+//   CubitCompat_export_solid_model(exp_bodies, filename.c_str(), "ACIS_SAT", exp_ents, cubit_version);
 
-  double dx, dy, dz; 
+//   double dx, dy, dz; 
   
-  get_translation(A,B,C,D,E,F,G,H,J,K,dx,dy,dz);
+//   get_translation(A,B,C,D,E,F,G,H,J,K,dx,dy,dz);
 
-  return 0;
+//   return 0;
 
-}
+// }
+
+
+
+
 
 
 // Function for charaterizing the sub-type of generalized quadratic described by the input coefficients.
