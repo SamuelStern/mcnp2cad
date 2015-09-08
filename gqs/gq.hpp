@@ -54,6 +54,7 @@ void elliptic_cyl(double a, double b, double c, double g, double h, double j, do
 void parabolic_cyl(double a, double b, double c, double g, double h, double j, double k);
 void hyperbolic_cyl(double a, double b, double c, double g, double h, double j, double k);
 void one_sheet_hyperboloid(double a, double b, double c, double g, double h, double j, double k);
+void two_sheet_hyperboloid(double a, double b, double c, double g, double h, double j, double k);
 
 void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list);
 void hyperbolic_curves_in_plane( double a, double b, int ax1, int ax2, DLIList<RefEdge*> &edge_list);

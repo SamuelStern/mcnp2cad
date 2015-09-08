@@ -136,7 +136,10 @@ GQ_TYPE characterize_surf( double A,
       return ONE_SHEET_HYPERBOLOID;
     }
   else if ( num_neg == 2 && num_zero == 0 && rhs )
-    return TWO_SHEET_HYPERBOLOID;
+    {
+      two_sheet_hyperboloid( a, b, c, g, h, j, rhs );
+      return TWO_SHEET_HYPERBOLOID;
+    }
   else if ( num_neg == 1 && num_zero == 0 && !rhs )
     {
       elliptic_cone( a, b, c, g, h, j, rhs );
@@ -695,7 +698,6 @@ void hyperbolic_cyl(double a, double b, double c, double g, double h, double j, 
 void one_sheet_hyperboloid(double a, double b, double c, double g, double h, double j, double k)
 {
 
-
   double A,B, scale_factor;;
   int sym_ax,ref_ax;
   //find the negative coefficient
@@ -732,18 +734,7 @@ void one_sheet_hyperboloid(double a, double b, double c, double g, double h, dou
   gqt->delete_RefEdge(hyperbolic_curves[1]);
   
   RefEntity* edge1 = dynamic_cast<RefEntity*>(hyperbolic_curves[0]);
-  
-  DLIList<RefEntity*> edge1_children;
-  
-  edge1->get_child_ref_entities(edge1_children);
-
-  //should just be the start and end vertices
-  std::cout << edge1_children.size() << std::endl;
-  assert(2 == edge1_children.size());
-  
-  //now re-cast both as RefVertices
-  RefVertex* v1 = dynamic_cast<RefVertex*>(edge1_children[0]);
-  RefVertex* v2 = dynamic_cast<RefVertex*>(edge1_children[1]);
+    
   DLIList<RefEntity*> ents_to_sweep;
   ents_to_sweep.insert(dynamic_cast<RefEntity*>(hyperbolic_curves[0]));
 
@@ -768,7 +759,86 @@ void one_sheet_hyperboloid(double a, double b, double c, double g, double h, dou
   
   return;
 }
-			   
+
+void two_sheet_hyperboloid(double a, double b, double c, double g, double h, double j, double k)
+{
+
+  double A,B, scale_factor;;
+  int sym_ax,ref_ax;
+  //find the positive coefficient
+  if (a > 0) 
+    {
+      A = a;
+      B = b;
+      scale_factor = c/b;
+      sym_ax  = 0;
+      ref_ax = 1;
+    }
+  else if (b > 0)
+    { 
+      A = b;
+      B = a;
+      scale_factor = c/a;
+      sym_ax  = 1;
+      ref_ax = 0;
+    }
+  else if (c > 0) 
+    {
+      A = c;
+      B = a;
+      scale_factor = b/a;
+      sym_ax  = 2;
+      ref_ax = 0;
+    }
+  
+  DLIList<RefEdge*> hyperbolic_curves;
+  
+  hyperbolic_curves_in_plane(A,B,sym_ax,ref_ax,hyperbolic_curves);
+  DLIList<RefEntity*> ents_to_sweep;
+  // ents_to_sweep.insert(dynamic_cast<RefEntity*>(hyperbolic_curves[0]));
+  // ents_to_sweep.insert(dynamic_cast<RefEntity*>(hyperbolic_curves[1]));
+
+  //trim the curves
+  double trm[3] = {0,0,0};
+  trm[sym_ax] = B;
+  double keep[3] = {0,0,0};
+  keep[ref_ax] = 1;
+  gmt->trim_curve( hyperbolic_curves[0], CubitVector(trm[0],trm[1],trm[2]),
+		   CubitVector(keep[0],keep[1],keep[2]));
+
+
+  gmt->trim_curve( hyperbolic_curves[1], CubitVector(trm[0],trm[1],trm[2]),
+		   CubitVector(keep[0],keep[1],keep[2]));
+
+  
+  CubitVector origin(0,0,0);
+  double sweep_ax[3] = {0,0,0};
+  sweep_ax[sym_ax] = 1;
+  CubitVector sweep_axis(sweep_ax[0], sweep_ax[1], sweep_axis[2]);
+  DLIList<Body*> new_bodies;
+
+  DLIList<RefEdge*> all_edges;
+  gqt->ref_edges(all_edges);
+
+  assert(2 == all_edges.size());
+  
+  ents_to_sweep.insert(dynamic_cast<RefEntity*>(all_edges[0]));
+  ents_to_sweep.insert(dynamic_cast<RefEntity*>(all_edges[1]));
+  
+  gmt->sweep_rotational(ents_to_sweep, origin, sweep_ax, 2*CUBIT_PI, new_bodies, CUBIT_FALSE, CUBIT_FALSE, 0, 0, 0, CUBIT_FALSE, CUBIT_TRUE);
+
+  assert(2==new_bodies.size());
+  
+  double sf[3] = {1,1,1};
+  sf[(c>0) ? 1:2] = scale_factor;
+  gqt->scale( new_bodies[0], CubitVector(0,0,0),CubitVector(sf[0],sf[1],sf[2]));
+  gqt->scale( new_bodies[1], CubitVector(0,0,0),CubitVector(sf[0],sf[1],sf[2]));
+  
+
+  
+  return;
+}
+
 
 /* Creates two hyperbolic curves in the xy plane using the parameters a & b
 
