@@ -46,7 +46,15 @@ int main()
   //check the bounds of each curve
 
   ////// Curve 1 Check ///////
-  CHECK_EQUAL( 2.0 , edge1_box.max_x() );
+  // CHECK_EQUAL( 2.0 , edge1_box.max_x() );
+  // CHECK_EQUAL( 1.0 , edge1_box.min_x() );
+
+  //should be created by now, time to export
+  DLIList<RefEntity*> exp_bodies;
+  int exp_ents;
+  CubitString cubit_version("12.2");
+  
+  CubitCompat_export_solid_model(exp_bodies, "test_file.sat", "ACIS_SAT", exp_ents, cubit_version);
 
 
 

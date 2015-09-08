@@ -878,8 +878,8 @@ void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list)
 {
 
   //first create a conic surface
-  CubitVector p1(b,0,0);
-  CubitVector p2(0,a,0);
+  CubitVector p1(0,0,0);
+  CubitVector p2(-b,a,0);
 
   RefVertex* v1 = gmt->make_RefVertex(p1);
 
@@ -895,7 +895,7 @@ void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list)
 
 
   //calculate the offset we want based on a & b to give us a pure hyperbole
-  double offset = a*a/b;
+  double offset = -a*a/b;
 
   //now create the plane
   Body* plane = gmt->planar_sheet(CubitVector(-b,-a,offset),CubitVector(b,-a,offset),
@@ -913,7 +913,7 @@ void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list)
   DLIList<RefEntity*> ents_to_translate, ents_translated;
   ents_to_translate.insert(dynamic_cast<RefEntity*>(edge_list[0]));
 
-  gqt->translate(ents_to_translate, -b, 0, -offset, true, ents_translated, false);
+  gqt->translate(ents_to_translate, 0, 0, -offset, true, ents_translated, false);
 
   gqt->delete_single_Body(new_bodies[0]);
   gqt->delete_single_Body(plane);
@@ -922,7 +922,7 @@ void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list)
   RefEdge *copy = gmt->make_RefEdge( edge_list[0], true);
 
   //now reflect this curve across the creation plane
-  CubitVector reflection_pt(b,0,0);
+  CubitVector reflection_pt(0,0,0);
   CubitVector reflection_ax(1,0,0);
 
   RefEntity* copy_ent = dynamic_cast<RefEntity*>(copy);
