@@ -1,0 +1,3 @@
+#!/bin/bash
+
+find ./ -executable | grep test_ | while read -r L; do command $L ; done
