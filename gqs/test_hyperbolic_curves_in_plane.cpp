@@ -49,4 +49,7 @@ int main()
   actual_endpoint = edges[1]->end_vertex()->center_point();
   CHECK_CUBITVECTORS_EQUAL(expected_endpoint, actual_endpoint);
 
+  //if we get to here, the tests have passed
+  std::cout << "PASSED" << std::endl;
+
 }

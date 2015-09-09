@@ -1,3 +1,12 @@
 #!/bin/bash
 
-find ./ -executable | grep test_ | while read -r L; do command $L ; done
+echo "----------"
+echo "UNIT TESTS"
+echo "----------"
+find ./ -executable | grep test_ | while read -r L; do echo "Running ${L:2}..." && command $L ; done
+
+
+echo "-------------"
+echo "GQ TYPE TESTS"
+echo "-------------"
+
