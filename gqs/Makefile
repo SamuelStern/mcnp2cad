@@ -26,4 +26,4 @@ test_hyperbolic_curves_in_plane: gq.o ProgOptions.o
 	g++ -g test_hyperbolic_curves_in_plane.cpp gq.o ProgOptions.o -o test_hyperbolic_curves_in_plane $(CGM_INCLUDES) $(CGM_LIBS_LINK)
 
 clean:
-	rm gq.o make_gq test_hyperbolic_curves *.sat
+	rm gq.o make_gq test_hyperbolic_curves test_hyperbolic_curves_in_plane  *.sat *.txt
