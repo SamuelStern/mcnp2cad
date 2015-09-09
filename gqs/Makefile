@@ -3,13 +3,14 @@
 include ${CGM_MAKE}
 
 #include ${MOAB_MAKE}
+SHELL = /bin/bash -o pipefail
 
 all: make_gq
 
-test: test_hyperbolic_curves test_hyperbolic_curves_in_plane test_types
+tests: test_hyperbolic_curves test_hyperbolic_curves_in_plane test_types
 
-check: test
-	rm test-log.txt; ./run_tests | tee test-log.txt
+check: tests
+	./run_tests | tee test-log.txt
 gq.o: 
 	g++ -g -c gq.cpp -o gq.o $(CGM_INCLUDES) $(CGM_LIBS_LINK)
 

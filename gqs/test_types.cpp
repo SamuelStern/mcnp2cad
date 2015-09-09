@@ -6,7 +6,8 @@
 
 int main()
 {
-
+  //having to re-establish these because I poorly defined them before
+  //need to fix
   GeometryModifyTool *gmt = GeometryModifyTool::instance();
   GeometryQueryTool *gqt = GeometryQueryTool::instance();
 
@@ -24,7 +25,7 @@ int main()
   DLIList<RefVolume*> vols;
   gqt->ref_volumes(vols);
 
-  CHECK_EQUAL (1, (int)vols.size());
+  CHECK_EQUAL(1, (int)vols.size());
 
   //if we get to this point, all of the tests have passed
   std::cout << "PASSED" << std::endl;
