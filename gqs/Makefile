@@ -1,9 +1,6 @@
 
-
-include ${CGM_MAKE}
-
-#include ${MOAB_MAKE}
 SHELL = /bin/bash -o pipefail
+include ${CGM_MAKE}
 
 all: make_gq
 
