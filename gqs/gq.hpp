@@ -31,8 +31,33 @@ void hyperbolic_cyl(double a, double b, double c, double g, double h, double j, 
 void one_sheet_hyperboloid(double a, double b, double c, double g, double h, double j, double k);
 void two_sheet_hyperboloid(double a, double b, double c, double g, double h, double j, double k);
 
+
+
+/* Creates two hyperbolic curves in the xy plane using the parameters a & b
+
+Hyperbolic Curve Form:
+
+x^2/a - y^2/b = 1
+
+symmetric axis - x
+reflection axis - y
+
+Returns: two RefEdge pointers to the curves
+
+*/
 void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list);
-void hyperbolic_curves_in_plane( double a, double b, int ax1, int ax2, DLIList<RefEdge*> &edge_list);
+
+/* this function will return hyperbolic curves in a plane of two principle axes
+
+symmetric_axis - intersecting axis of symmetry for one of the curves
+
+reflecting_axis - reflecting axis for the curves
+
+(for the axes arguments: 0 is x, 1 is y, 2 is z)
+
+*/
+
+void hyperbolic_curves_in_plane( double a, double b, int symmetric_axis, int reflecting_axis, DLIList<RefEdge*> &edge_list);
 
 
 GQ_TYPE characterize_surf( double A,

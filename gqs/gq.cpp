@@ -786,20 +786,6 @@ void two_sheet_hyperboloid(double a, double b, double c, double g, double h, dou
   return;
 }
 
-
-/* Creates two hyperbolic curves in the xy plane using the parameters a & b
-
-Hyperbolic Curve Form:
-
-x^2/a - y^2/b = 1
-
-symmetric axis - x
-reflection axis - y
-
-Returns: two RefEdge pointers to the curves
-
-*/
-
 void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list)
 {
 
@@ -865,18 +851,7 @@ void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list)
   return;
 }
 
-/* this function will return hyperbolic curves in a plane of two principle axes
-
-
-
-axis 1 (ax1) - axis of symmetry for one of the curves
-
-axis 2 (ax2) - reflecting axis for the curves
-
-(for the axes arguments: 0 is x, 1 is y, 2 is z
-
-*/
-void hyperbolic_curves_in_plane( double a, double b, int ax1, int ax2, DLIList<RefEdge*> &edge_list)
+void hyperbolic_curves_in_plane( double a, double b, int symmetric_ax, int reflecting_axis, DLIList<RefEdge*> &edge_list)
 {
 
   //first create our curves in the yz plane
@@ -895,7 +870,7 @@ void hyperbolic_curves_in_plane( double a, double b, int ax1, int ax2, DLIList<R
       std::cout << "Expected two curves. Leaving function without action..." << std::endl;
 
   //make sure our axes aren't the same
-  if ( ax1 == ax2 )
+  if ( symmetric_ax == reflecting_axis )
     {
       std::cout << "Axes do not define a proper plane. Leaving function without action..." << std::endl;
       return;
@@ -906,11 +881,11 @@ void hyperbolic_curves_in_plane( double a, double b, int ax1, int ax2, DLIList<R
   int sym_axis = 0;
 
   //rotate the reflection axis to match the one requested
-  if ( ax2 != 1 ) //if this is already the y axis, skip
+  if ( reflecting_axis != 1 ) //if this is already the y axis, skip
     {
       //setup the rotation axis
       double ax[3] = {0,0,0};
-      ax[( 2 == ax2 ) ? 0 : 2] = 1;
+      ax[( 2 == reflecting_axis ) ? 0 : 2] = 1;
       double degrees = 90;
 
       DLIList<RefEntity*> ents_rotated;
@@ -922,12 +897,12 @@ void hyperbolic_curves_in_plane( double a, double b, int ax1, int ax2, DLIList<R
     }
 
   //if the symmetric axis is incorrect, rotate around reflecting axis
-  if ( sym_axis != ax1 )
+  if ( sym_axis != symmetric_ax )
     {
 
       //setup the rotation axis
       double ax[3] = {0,0,0};
-      ax[ax2] = 1;
+      ax[reflecting_axis] = 1;
       double degrees = 90;
 
       DLIList<RefEntity*> ents_rotated;
