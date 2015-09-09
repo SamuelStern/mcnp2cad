@@ -30,7 +30,9 @@ bool check_CubitVectors_equal( CubitVector A, CubitVector B, const char* Aname, 
 if ( (A[0] - B[0] > tol) || ( A[1] - B[1] > tol ) || (A[2] - B[2] > tol ) )
   {
 
-std::cout << "ERROR: CubitVector " << Aname << " does not equal " << Bname << "." << std::endl;
+std::cout << "=====" << std::endl << "ERROR" << std::endl << "=====" << std::endl;
+std::cout << "CubitVector " << Aname << " does not equal " << Bname
+          << " (from line " << line << ")" << std::endl;
 CHECK_REAL_EQUAL( A[0], B[0], tol);
 CHECK_REAL_EQUAL( A[1], B[1], tol);
 CHECK_REAL_EQUAL( A[2], B[2], tol);
@@ -62,14 +64,35 @@ int main()
   //check the bounds of each curve
 
   ////// Curve 1 Check ///////
+  CubitVector expected_startpoint(1.4142135,2.0,0);
+  CubitVector actual_startpoint = edges[0]->start_vertex()->center_point();
+  CHECK_CUBITVECTORS_EQUAL(expected_startpoint, actual_startpoint);
+  
   CubitVector expected_midpoint(1.0,0.0,0.0);
   CubitVector actual_midpoint;
-  
   edges[0]->mid_point(actual_midpoint);
-  CHECK_REAL_EQUAL ( 1.0, actual_midpoint[0], tol );
+  CHECK_CUBITVECTORS_EQUAL(expected_midpoint, actual_midpoint );
 
-  CHECK_CUBITVECTORS_EQUAL( expected_midpoint, actual_midpoint );
-  //should be created by now, time to export
+  CubitVector expected_endpoint(1.4142135,-2.0,0);
+  CubitVector actual_endpoint = edges[0]->end_vertex()->center_point();
+  CHECK_CUBITVECTORS_EQUAL(expected_endpoint, actual_endpoint);
+
+  ////// Curve 2 Check ///////
+  expected_startpoint.set(-1.4142135,2.0,0);
+  actual_startpoint = edges[1]->start_vertex()->center_point();
+  CHECK_CUBITVECTORS_EQUAL(expected_startpoint, actual_startpoint);
+  
+  expected_midpoint.set(1.0,0.0,0.0);
+  actual_midpoint;
+  edges[0]->mid_point(actual_midpoint);
+  CHECK_CUBITVECTORS_EQUAL(expected_midpoint, actual_midpoint );
+
+  expected_endpoint.set(-1.4142135,-2.0,0);
+  actual_endpoint = edges[1]->end_vertex()->center_point();
+  CHECK_CUBITVECTORS_EQUAL(expected_endpoint, actual_endpoint);
+
+  
+  
   if (false)
     {
       DLIList<RefEntity*> exp_bodies;
