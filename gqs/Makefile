@@ -6,7 +6,7 @@ include ${CGM_MAKE}
 
 all: make_gq
 
-test: test_hyperbolic_curves test_hyperbolic_curves_in_plane
+test: test_hyperbolic_curves test_hyperbolic_curves_in_plane test_types
 
 check: test
 	rm test-log.txt; ./run_tests | tee test-log.txt
@@ -25,5 +25,8 @@ test_hyperbolic_curves: gq.o ProgOptions.o
 test_hyperbolic_curves_in_plane: gq.o ProgOptions.o
 	g++ -g test_hyperbolic_curves_in_plane.cpp gq.o ProgOptions.o -o test_hyperbolic_curves_in_plane $(CGM_INCLUDES) $(CGM_LIBS_LINK)
 
+test_types: gq.o ProgOptions.o
+	g++ -g test_types.cpp gq.o ProgOptions.o -o test_types $(CGM_INCLUDES) $(CGM_LIBS_LINK)
+
 clean:
-	rm gq.o make_gq test_hyperbolic_curves test_hyperbolic_curves_in_plane  *.sat *.txt
+	rm gq.o make_gq test_hyperbolic_curves test_hyperbolic_curves_in_plane test_types  *.sat *.txt
