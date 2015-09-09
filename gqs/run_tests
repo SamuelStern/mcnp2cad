@@ -1,20 +1,31 @@
 #!/bin/bash
 
+function check {
+    if [ $? -ne 0 ]; then exit 1; fi
+}
+    
 function gq_type_tests {
 #PARABOLIC CYLINDER
 ./make_gq -- 1 0 0 0 0 0 0 1 0 0
+check
 #ELLIPTIC CYLINDER
 ./make_gq -- 1 1 0 0 0 0 0 0 0 -1
+check
 #HYPERBOLIC CYLINDER
 ./make_gq -- 1 -1 0 0 0 0 0 0 0 -1
+check
 #ELLIPTIC PARABOLOID
 ./make_gq -- 1 1 0 0 0 0 0 0 -1 0
+check
 #ELLIPTIC CONE
 ./make_gq -- 1 1 -1 0 0 0 0 0 0 0
+check
 #ONE SHEET HYPERBOLOID
 ./make_gq -- 1 -1 1 0 0 0 0 0 0 -1
+check
 #TWO SHEET HYPERBOLOID
 ./make_gq -- -1 -1 1 0 0 0 0 0 0 -1
+check
 #HYPERBOLID PARABOLOID
 # Not yet supported ./make_gq -- 1 -1 0 0 0 0 0 -1 0
 }
@@ -29,7 +40,7 @@ while read -r L; do
     if $L ; then : ; else exit 1; fi 
 done < "test_list.txt"
 
-
+echo ""
 echo "-------------"
 echo "GQ TYPE TESTS"
 echo "-------------"

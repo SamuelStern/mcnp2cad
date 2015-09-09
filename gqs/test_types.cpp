@@ -19,14 +19,12 @@ int main()
 
   //Start with the Parabolic Cylinder
   GQ_TYPE this_type= characterize_surf(A,B,C,D,E,F,G,H,J,K);
-  CHECK_EQUAL( PARABOLIC_CYL, this_type );
+  CHECK_EQUAL(PARABOLIC_CYL, this_type);
 
   DLIList<RefVolume*> vols;
   gqt->ref_volumes(vols);
 
-  CHECK_EQUAL ( 1, (int)vols.size() );
-
-  
+  CHECK_EQUAL (1, (int)vols.size());
 
   //if we get to this point, all of the tests have passed
   std::cout << "PASSED" << std::endl;
