@@ -4,7 +4,7 @@
 
 #define CHECK_TOLERANCE 1e-6
 
-#define FLAG_ERROR throw 1
+#define FLAG_ERROR exit(1)
 
 inline void flag_error() { FLAG_ERROR; }
 

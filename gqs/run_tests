@@ -1,12 +1,55 @@
 #!/bin/bash
 
+function gq_type_tests {
+#PARABOLIC CYLINDER
+./make_gq -- 1 0 0 0 0 0 0 1 0 0
+#ELLIPTIC CYLINDER
+./make_gq -- 1 1 0 0 0 0 0 0 0 -1
+#HYPERBOLIC CYLINDER
+./make_gq -- 1 -1 0 0 0 0 0 0 0 -1
+#ELLIPTIC PARABOLOID
+./make_gq -- 1 1 0 0 0 0 0 0 -1 0
+#ELLIPTIC CONE
+./make_gq -- 1 1 -1 0 0 0 0 0 0 0
+#ONE SHEET HYPERBOLOID
+./make_gq -- 1 -1 1 0 0 0 0 0 0 -1
+#TWO SHEET HYPERBOLOID
+./make_gq -- -1 -1 1 0 0 0 0 0 0 -1
+#HYPERBOLID PARABOLOID
+# Not yet supported ./make_gq -- 1 -1 0 0 0 0 0 -1 0
+}
+
 echo "----------"
 echo "UNIT TESTS"
 echo "----------"
-find ./ -executable | grep test_ | while read -r L; do echo "Running ${L:2}..." && command $L ; done
+
+find ./ -executable | grep test_ > test_list.txt
+while read -r L; do 
+    echo "Running ${L:2}..."
+    if $L ; then : ; else exit 1; fi 
+done < "test_list.txt"
 
 
 echo "-------------"
 echo "GQ TYPE TESTS"
 echo "-------------"
+if [ -e ./make_gq ]; then
+    gq_type_tests
+else
+    echo "make_gq program doesn't exist, attempting to create..."
+    echo ""
+    make make_gq
+    if [ -e ./make_gq ]; then 
+	echo ""
+	echo "Running GQ Type Tests..."
+	echo ""
+	gq_type_tests
+    else
+	echo ""
+	echo "Could not create make_gq program, skipping tests..."
+    fi
+
+
+fi
+
 
