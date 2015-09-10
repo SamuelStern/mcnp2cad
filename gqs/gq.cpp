@@ -18,6 +18,8 @@ CubitStatus stat = InitCGMA::initialize_cgma();
 GeometryModifyTool *gmt = GeometryModifyTool::instance();
 GeometryQueryTool *gqt = GeometryQueryTool::instance();
 
+double large_val = 1e8;
+
 // Function for charaterizing the sub-type of generalized quadratic described by the input coefficients.
 GQ_TYPE characterize_surf( double A,
 		       double B,
@@ -791,7 +793,7 @@ void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list)
 
   //first create a conic surface
   CubitVector p1(0,0,0);
-  CubitVector p2(a,-b,0);
+  CubitVector p2(sqrt(a),sqrt(fabs(b)),0);
 
   RefVertex* v1 = gmt->make_RefVertex(p1);
 
@@ -807,11 +809,11 @@ void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list)
 
 
   //calculate the offset we want based on a & b to give us a pure hyperbole
-  double offset = -b;
+  double offset = p2[1];
 
   //now create the plane
-  Body* plane = gmt->planar_sheet(CubitVector(-2*b,-2*a,offset),CubitVector(2*b,-2*a,offset),
-				  CubitVector(2*b,2*a,offset),CubitVector(-2*b,2*a,offset));
+  Body* plane = gmt->planar_sheet(CubitVector(-large_val,-large_val,offset),CubitVector(large_val,-large_val,offset),
+				  CubitVector(large_val,large_val,offset),CubitVector(-large_val,large_val,offset));
 
 
   DLIList<RefFace*> surfs;
