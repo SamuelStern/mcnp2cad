@@ -21,6 +21,21 @@ std::ostream& operator<<(std::ostream& out, const GQ_TYPE value){
 }
 
 
+std::map<GQ_TYPE,void (*)(double,double,double,double,double,double,double)>  gq_funcs()
+{
+std::map<GQ_TYPE, void (*)(double,double,double,double,double,double,double)> gq_map;
+
+ gq_map[ONE_SHEET_HYPERBOLOID]= &one_sheet_hyperboloid;
+ gq_map[TWO_SHEET_HYPERBOLOID]= &two_sheet_hyperboloid;
+ gq_map[ ELLIPTIC_CONE]= &elliptic_cone;
+ gq_map[ ELLIPTIC_PARABOLOID]= &elliptic_paraboloid;
+ gq_map[ ELLIPTIC_CYL]= &elliptic_cyl;
+ gq_map[ HYPERBOLIC_CYL]= &hyperbolic_cyl;
+ gq_map[ PARABOLIC_CYL]= &parabolic_cyl;
+
+  
+  return gq_map;
+  }
 
 // Function for charaterizing the sub-type of generalized quadratic described by the input coefficients.
 GQ_TYPE characterize_surf( double A,
