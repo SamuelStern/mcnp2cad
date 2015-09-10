@@ -2,15 +2,8 @@
 #include "test_gq_utils.hpp"
 
 
-
-
 int main()
 {
-  //having to re-establish these because I poorly defined them before
-  //need to fix
-  GeometryModifyTool *gmt = GeometryModifyTool::instance();
-  GeometryQueryTool *gqt = GeometryQueryTool::instance();
-
   double A,B,C,D,E,F,G,H,J,K;
 
   A = 1.0; B = 0.0; C = 0.0;
@@ -30,6 +23,4 @@ int main()
   //if we get to this point, all of the tests have passed
   std::cout << "PASSED" << std::endl;
   return 0;
-
-
 }

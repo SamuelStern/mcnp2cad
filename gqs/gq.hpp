@@ -9,6 +9,12 @@
 #include "InitCGMA.hpp"
 #include "CubitCompat.hpp"
 
+//doing this globally for now to make function signatures easier to write
+extern GeometryModifyTool *gmt;
+extern GeometryQueryTool *gqt;
+
+
+
 
 enum GQ_TYPE {UNKNOWN = 0,
 	      ELLIPSOID,
