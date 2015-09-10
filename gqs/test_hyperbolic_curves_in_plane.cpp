@@ -21,7 +21,7 @@ int main()
   //check the bounds of each curve
 
   ////// Curve 1 Check ///////
-  CubitVector expected_startpoint(0.0,1.4142135,2.0);
+  CubitVector expected_startpoint(0.0,2.0,-2.4494897);
   CubitVector actual_startpoint = edges[0]->start_vertex()->center_point();
   CHECK_CUBITVECTORS_EQUAL(expected_startpoint, actual_startpoint);
   
@@ -30,21 +30,21 @@ int main()
   edges[0]->mid_point(actual_midpoint);
   CHECK_CUBITVECTORS_EQUAL(expected_midpoint, actual_midpoint );
 
-  CubitVector expected_endpoint(0.0,1.4142135,-2.0);
+  CubitVector expected_endpoint(0.0,2.0,2.4494897);
   CubitVector actual_endpoint = edges[0]->end_vertex()->center_point();
   CHECK_CUBITVECTORS_EQUAL(expected_endpoint, actual_endpoint);
 
   ////// Curve 2 Check ///////
-  expected_startpoint.set(0.0,-1.4142135,2.0);
+  expected_startpoint.set(0.0,-2.0,-2.4494897);
   actual_startpoint = edges[1]->start_vertex()->center_point();
   CHECK_CUBITVECTORS_EQUAL(expected_startpoint, actual_startpoint);
   
-  expected_midpoint.set(0.0,1.0,0.0);
+  expected_midpoint.set(0.0,-1.0,0.0);
   actual_midpoint;
-  edges[0]->mid_point(actual_midpoint);
+  edges[1]->mid_point(actual_midpoint);
   CHECK_CUBITVECTORS_EQUAL(expected_midpoint, actual_midpoint );
 
-  expected_endpoint.set(0.0,-1.4142135,-2.0);
+  expected_endpoint.set(0.0,-2.0,2.4494897);
   actual_endpoint = edges[1]->end_vertex()->center_point();
   CHECK_CUBITVECTORS_EQUAL(expected_endpoint, actual_endpoint);
 
