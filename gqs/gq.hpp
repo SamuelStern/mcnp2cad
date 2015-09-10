@@ -50,34 +50,3 @@ reflecting_axis - reflecting axis for the curves
 
 void hyperbolic_curves_in_plane( double a, double b, int symmetric_axis, int reflecting_axis, DLIList<RefEdge*> &edge_list);
 
-
-void complete_square ( double A,
-		       double B,
-		       double C, 
-		       double D, 
-		       double E,
-		       double F,
-		       double G, 
-		       double H, 
-		       double J,
-		       double K,
-		       double &a,
-		       double &b, 
-		       double &c, 
-		       double &rhs,
-		       double &W);
-
-
-void get_translation( double A,
-		      double B,
-		      double C, 
-		      double D, 
-		      double E,
-		      double F,
-		      double G, 
-		      double H, 
-		      double J,
-		      double K,
-		      double &dx,
-		      double &dy, 
-		      double &dz);

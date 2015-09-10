@@ -27,3 +27,35 @@ GQ_TYPE characterize_surf( double A,
 		       double H, 
 		       double J,
 			   double K);
+
+
+void complete_square ( double A,
+		       double B,
+		       double C, 
+		       double D, 
+		       double E,
+		       double F,
+		       double G, 
+		       double H, 
+		       double J,
+		       double K,
+		       double &a,
+		       double &b, 
+		       double &c, 
+		       double &rhs,
+		       double &W);
+
+
+void get_translation( double A,
+		      double B,
+		      double C, 
+		      double D, 
+		      double E,
+		      double F,
+		      double G, 
+		      double H, 
+		      double J,
+		      double K,
+		      double &dx,
+		      double &dy, 
+		      double &dz);
