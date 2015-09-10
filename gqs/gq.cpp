@@ -1,5 +1,4 @@
 
-// #include "moab/ProgOptions.hpp"
 #include "GeometryModifyTool.hpp"
 #include "GeometryQueryTool.hpp"
 #include "GMem.hpp"
@@ -350,11 +349,13 @@ if (3 == axis)
  //trim the curve at the origin
  CubitStatus result = gmt->trim_curve(parab,mdpt,pt2_pos);
  if ( result != CUBIT_SUCCESS ) std::cout << "Could not trim the prabolic curve." << std::endl;
-
+ RefEdge* trimmed_parab = gqt->get_last_ref_edge();
  //gather the bounding curves to create the surface 
  // note: trimmed curve is not parab curve
  DLIList<RefEdge*> bounding_curves;
- gqt->ref_edges(bounding_curves);
+ bounding_curves.insert(line1);
+ bounding_curves.insert(line2);
+ bounding_curves.insert(trimmed_parab);
  
  //create the surface
  RefFace* surf = gmt->make_RefFace(TORUS_SURFACE_TYPE, bounding_curves, true);
@@ -435,14 +436,10 @@ void elliptic_cyl(double a, double b, double c, double g, double h, double j, do
   CubitVector gen_ax(plane[0],plane[1],plane[2]);
 
   CubitStatus result = gmt->create_ellipse_surface(r1,r2,gen_ax);
-  
-  //now get ready to sweep the ellipse along the generation axis
-  DLIList<RefFace*> surfs;
-  gqt->ref_faces(surfs);
-  assert(1 == surfs.size());
+  RefFace* ellipse_face = gqt->get_last_ref_face();
 
   DLIList<RefEntity*> sweep_ents;
-  RefEntity* ent = dynamic_cast<RefEntity*>(surfs[0]);
+  RefEntity* ent = dynamic_cast<RefEntity*>(ellipse_face);
   sweep_ents.insert(ent);
 
   DLIList<Body*> new_bodies;
@@ -754,11 +751,11 @@ void two_sheet_hyperboloid(double a, double b, double c, double g, double h, dou
   keep[ref_ax] = 1;
   gmt->trim_curve( hyperbolic_curves[0], CubitVector(trm[0],trm[1],trm[2]),
 		   CubitVector(keep[0],keep[1],keep[2]));
-
+  RefEdge* trimmed_curvea = gqt->get_last_ref_edge();
 
   gmt->trim_curve( hyperbolic_curves[1], CubitVector(trm[0],trm[1],trm[2]),
 		   CubitVector(keep[0],keep[1],keep[2]));
-
+  RefEdge* trimmed_curveb = gqt->get_last_ref_edge();
   
   CubitVector origin(0,0,0);
   double sweep_ax[3] = {0,0,0};
@@ -766,13 +763,13 @@ void two_sheet_hyperboloid(double a, double b, double c, double g, double h, dou
   CubitVector sweep_axis(sweep_ax[0], sweep_ax[1], sweep_axis[2]);
   DLIList<Body*> new_bodies;
 
-  DLIList<RefEdge*> all_edges;
-  gqt->ref_edges(all_edges);
-
-  assert(2 == all_edges.size());
+  DLIList<RefEdge*> edges_to_sweep;
+  edges_to_sweep.insert(trimmed_curvea);
+  edges_to_sweep.insert(trimmed_curveb);
+  assert(2 == edges_to_sweep.size());
   
-  ents_to_sweep.insert(dynamic_cast<RefEntity*>(all_edges[0]));
-  ents_to_sweep.insert(dynamic_cast<RefEntity*>(all_edges[1]));
+  ents_to_sweep.insert(dynamic_cast<RefEntity*>(edges_to_sweep[0]));
+  ents_to_sweep.insert(dynamic_cast<RefEntity*>(edges_to_sweep[1]));
   
   gmt->sweep_rotational(ents_to_sweep, origin, sweep_ax, 2*CUBIT_PI, new_bodies, CUBIT_FALSE, CUBIT_FALSE, 0, 0, 0, CUBIT_FALSE, CUBIT_TRUE);
 
@@ -806,7 +803,7 @@ void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list)
 
   DLIList<Body*> new_bodies;
   gmt->sweep_rotational(ents_to_sweep, CubitVector(0,0,0), CubitVector(1,0,0), 2*CUBIT_PI, new_bodies, CUBIT_FALSE, CUBIT_FALSE);
-
+  RefFace* frustrum_face = gqt->get_last_ref_face();
 
   //calculate the offset we want based on a & b to give us a pure hyperbole
   double offset = p2[1];
@@ -814,12 +811,9 @@ void hyperbolic_curves(double a, double b, DLIList<RefEdge*> &edge_list)
   //now create the plane
   Body* plane = gmt->planar_sheet(CubitVector(-large_val,-large_val,offset),CubitVector(large_val,-large_val,offset),
 				  CubitVector(large_val,large_val,offset),CubitVector(-large_val,large_val,offset));
+  RefFace* planar_face = gqt->get_last_ref_face();
 
-
-  DLIList<RefFace*> surfs;
-  gqt->ref_faces(surfs);
-
-  gmt->surface_intersection(surfs[0],surfs[1],edge_list);
+  gmt->surface_intersection(frustrum_face,planar_face,edge_list);
 
   //need to move this back to the axis
   assert( 1 == edge_list.size() );
