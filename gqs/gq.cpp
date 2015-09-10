@@ -351,7 +351,6 @@ if (3 == axis)
  if ( result != CUBIT_SUCCESS ) std::cout << "Could not trim the prabolic curve." << std::endl;
  RefEdge* trimmed_parab = gqt->get_last_ref_edge();
  //gather the bounding curves to create the surface 
- // note: trimmed curve is not parab curve
  DLIList<RefEdge*> bounding_curves;
  bounding_curves.insert(line1);
  bounding_curves.insert(line2);
@@ -583,9 +582,7 @@ void hyperbolic_cyl(double a, double b, double c, double g, double h, double j, 
   //and make a line to connect them
   RefEdge *line1 = gmt->make_RefEdge(STRAIGHT_CURVE_TYPE,v1,v2);
 
-
   //repeat for the other curve 
-
   RefEntity* edge2 = dynamic_cast<RefEntity*>(hyperbolic_curves[1]);
 
   DLIList<RefEntity*> edge2_children;
@@ -691,7 +688,6 @@ void one_sheet_hyperboloid(double a, double b, double c, double g, double h, dou
   DLIList<Body*> new_bodies;
   
   gmt->sweep_rotational(ents_to_sweep, origin, sweep_ax, 2*CUBIT_PI, new_bodies, CUBIT_FALSE, CUBIT_FALSE, 0, 0, 0, CUBIT_FALSE, CUBIT_TRUE);
-
 
   assert(1 == new_bodies.size());
 
