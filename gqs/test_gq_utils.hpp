@@ -35,5 +35,27 @@ CHECK_REAL_EQUAL( A[0], B[0], CHECK_TOLERANCE);
 CHECK_REAL_EQUAL( A[1], B[1], CHECK_TOLERANCE);
 CHECK_REAL_EQUAL( A[2], B[2], CHECK_TOLERANCE);
 
+  }
 }
+
+void clean_cgma()
+{
+  DLIList<Body*> all_bodies;
+  gqt->bodies(all_bodies);
+
+  gqt->delete_Body(all_bodies);
+
+  DLIList<RefFace*> all_faces;
+  gqt->ref_faces(all_faces);
+  for(unsigned int i=0; i < all_faces.size(); i++) gqt->delete_RefFace(all_faces[i]);
+
+  DLIList<RefEdge*> all_edges;
+  gqt->ref_edges(all_edges);
+  for(unsigned int i=0; i < all_edges.size(); i++) gqt->delete_RefEdge(all_edges[i]);
+  
+  DLIList<RefVertex*> all_verts;
+  gqt->ref_vertices(all_verts);
+  for(unsigned int i=0; i < all_verts.size(); i++) gqt->delete_RefVertex(all_verts[i]);
+
+  
 }
