@@ -14,21 +14,6 @@ extern GeometryModifyTool *gmt;
 extern GeometryQueryTool *gqt;
 
 
-
-
-enum GQ_TYPE {UNKNOWN = 0,
-	      ELLIPSOID,
-	      ONE_SHEET_HYPERBOLOID,
-	      TWO_SHEET_HYPERBOLOID,
-	      ELLIPTIC_CONE,
-	      ELLIPTIC_PARABOLOID,
-	      HYPERBOLIC_PARABOLOID,
-	      ELLIPTIC_CYL,
-	      HYPERBOLIC_CYL,
-	      PARABOLIC_CYL};
-
-
-
 void elliptic_cone(double a, double b, double c, double g, double h, double j, double k);
 void elliptic_paraboloid(double a, double b, double c, double g, double h, double j, double k);
 void elliptic_cyl(double a, double b, double c, double g, double h, double j, double k);
@@ -65,17 +50,6 @@ reflecting_axis - reflecting axis for the curves
 
 void hyperbolic_curves_in_plane( double a, double b, int symmetric_axis, int reflecting_axis, DLIList<RefEdge*> &edge_list);
 
-
-GQ_TYPE characterize_surf( double A,
-		       double B,
-		       double C, 
-		       double D, 
-		       double E,
-		       double F,
-		       double G, 
-		       double H, 
-		       double J,
-		       double K);
 
 void complete_square ( double A,
 		       double B,

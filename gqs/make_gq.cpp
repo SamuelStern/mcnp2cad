@@ -1,28 +1,7 @@
 
-
-
 #include "ProgOptions.hpp"
 #include "gq.hpp"
-
-std::ostream& operator<<(std::ostream& out, const GQ_TYPE value){
-    static std::map<GQ_TYPE, std::string> strings;
-    if (strings.size() == 0){
-#define INSERT_ELEMENT(p) strings[p] = #p
-      INSERT_ELEMENT(UNKNOWN);
-      INSERT_ELEMENT(ELLIPSOID);
-      INSERT_ELEMENT(ONE_SHEET_HYPERBOLOID);
-      INSERT_ELEMENT(TWO_SHEET_HYPERBOLOID);
-      INSERT_ELEMENT(ELLIPTIC_CONE);
-      INSERT_ELEMENT(ELLIPTIC_PARABOLOID);
-      INSERT_ELEMENT(HYPERBOLIC_PARABOLOID);
-      INSERT_ELEMENT(ELLIPTIC_CYL);
-      INSERT_ELEMENT(HYPERBOLIC_CYL);
-      INSERT_ELEMENT(PARABOLIC_CYL);
-#undef INSERT_ELEMENT
-    }   
-    return out << strings[value];
-}
-
+#include "mcnp2cad_funcs.hpp"
 
 /*
  Desription: Program for the creation of a Generalized Quadratic (GQ) surface using CGM

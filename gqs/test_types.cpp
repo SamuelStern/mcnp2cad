@@ -1,7 +1,6 @@
 
 #include "test_gq_utils.hpp"
 
-
 int main()
 {
   double A,B,C,D,E,F,G,H,J,K;

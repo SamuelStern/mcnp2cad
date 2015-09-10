@@ -1,6 +1,6 @@
 
 #include "gq.hpp"
-
+#include "mcnp2cad_funcs.hpp"
 
 #define CHECK_TOLERANCE 1e-6
 
