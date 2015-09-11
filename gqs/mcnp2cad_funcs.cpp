@@ -130,7 +130,10 @@ void complete_square ( double &A,
 		       double &G, 
 		       double &H, 
 		       double &J,
-		       double &K)
+		       double &K,
+		       double &dx,
+		       double &dy,
+		       double &dz)
 {
 
   double W;
@@ -156,6 +159,14 @@ void complete_square ( double &A,
   J/=dum;
 
   K = ( W == 0 ) ? 0 : -1;
+
+  dx = (A == 0) ? 0 : G/(2*A);
+  dy = (B == 0) ? 0 : H/(2*B);
+  dz = (C == 0) ? 0 : J/(2*C);
+
+  if ( G/A < 0 ) dx *= -1;
+  if ( H/B < 0 ) dy *= -1;
+  if ( J/C < 0 ) dz *= -1;
 
   return;
 

@@ -29,7 +29,10 @@ void complete_square ( double &A,
 		       double &G, 
 		       double &H, 
 		       double &J,
-		       double &K);
+		       double &K,
+		       double &dx,
+		       double &dy,
+		       double &dz);
 
 
 void get_translation( double A,

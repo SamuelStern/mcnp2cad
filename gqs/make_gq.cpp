@@ -53,7 +53,8 @@ int main ( int argc, char** argv ) {
 
 
   //complete the square on the second and first order terms
-  complete_square(A,B,C,G,H,J,K);
+  double dx,dy,dz;
+  complete_square(A,B,C,G,H,J,K,dz,dy,dz);
   
   //The first step is to characterize the surface
   GQ_TYPE type = characterize_surf(A,B,C,G,H,J,K);
@@ -73,10 +74,6 @@ int main ( int argc, char** argv ) {
   CubitString cubit_version("12.2");
   
   CubitCompat_export_solid_model(exp_bodies, filename.c_str(), "ACIS_SAT", exp_ents, cubit_version);
-
-  double dx, dy, dz; 
-  
-  get_translation(A,B,C,D,E,F,G,H,J,K,dx,dy,dz);
 
   return 0;
 

@@ -3,11 +3,10 @@
 
 int main()
 {
-  double A,B,C,D,E,F,G,H,J,K;
+  double A,B,C,G,H,J,K;
   
   //Start with the Parabolic Cylinder
   A = 1.0; B = 0.0; C = 0.0;
-  D = 0.0; E = 0,0; F = 0,0; 
   G = 0.0; H = -1.0; J = 0.0;
   K = 0.0;
 
@@ -17,7 +16,6 @@ int main()
   //Elliptic Cylinder
   clean_cgma();
   A = 1.0; B = 2.0; C = 0.0;
-  D = 0.0; E = 0,0; F = 0,0; 
   G = 0.0; H = 0.0; J = 0.0;
   K = -1.0;
 
@@ -28,7 +26,6 @@ int main()
   //Hyperbolic Cylinder
   clean_cgma();
   A = 1.0; B = -2.0; C = 0.0;
-  D = 0.0; E = 0,0; F = 0,0; 
   G = 0.0; H = 0.0; J = 0.0;
   K = -1.0;
 
@@ -39,7 +36,6 @@ int main()
   //Elliptic Paraboloid
   clean_cgma();
   A = 1.0; B = 2.0; C = 0.0;
-  D = 0.0; E = 0,0; F = 0,0; 
   G = 0.0; H = 0.0; J = -1.0;
   K = 0.0;
 
@@ -49,7 +45,6 @@ int main()
   //Elliptic Cone
   clean_cgma();
   A = 1.0; B = 2.0; C = -3.0;
-  D = 0.0; E = 0,0; F = 0,0; 
   G = 0.0; H = 0.0; J = 0.0;
   K = 0.0;
 
@@ -59,7 +54,6 @@ int main()
   //One Sheet Hyperpoloid
   clean_cgma();
   A = 1.0; B = 2.0; C = -3.0;
-  D = 0.0; E = 0,0; F = 0,0; 
   G = 0.0; H = 0.0; J = 0.0;
   K = -1.0;
 
@@ -70,7 +64,6 @@ int main()
   //Two Sheet Hyperpoloid
   clean_cgma();
   A = 1.0; B = -2.0; C = -3.0;
-  D = 0.0; E = 0,0; F = 0,0; 
   G = 0.0; H = 0.0; J = 0.0;
   K = -1.0;
 
