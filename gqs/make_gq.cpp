@@ -53,10 +53,10 @@ int main ( int argc, char** argv ) {
 
 
   //complete the square on the second and first order terms
-  
+  complete_square(A,B,C,G,H,J,K);
   
   //The first step is to characterize the surface
-  GQ_TYPE type = characterize_surf(A,B,C,D,E,F,G,H,J,K);
+  GQ_TYPE type = characterize_surf(A,B,C,G,H,J,K);
   gqs[type](A,B,C,G,H,J,K);
   
   if (!type)

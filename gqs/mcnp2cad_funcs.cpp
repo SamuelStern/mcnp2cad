@@ -42,17 +42,12 @@ std::map<GQ_TYPE, void (*)(double,double,double,double,double,double,double)> gq
 GQ_TYPE characterize_surf( double A,
 		       double B,
 		       double C, 
-		       double D, 
-		       double E,
-		       double F,
 		       double G, 
 		       double H, 
 		       double J,
 		       double K)
 {
 
-  //first things first, complete the square to get the equation in the correct form
-  complete_square(A,B,C,G,H,J,K);
   if (false)
     {
       std::cout << "a= " << A << std::endl;

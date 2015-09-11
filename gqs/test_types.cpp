@@ -11,7 +11,7 @@ int main()
   G = 0.0; H = -1.0; J = 0.0;
   K = 0.0;
 
-  GQ_TYPE this_type= characterize_surf(A,B,C,D,E,F,G,H,J,K);
+  GQ_TYPE this_type= characterize_surf(A,B,C,G,H,J,K);
   CHECK_EQUAL(PARABOLIC_CYL, this_type);
   
   //Elliptic Cylinder
@@ -21,7 +21,7 @@ int main()
   G = 0.0; H = 0.0; J = 0.0;
   K = -1.0;
 
-  this_type= characterize_surf(A,B,C,D,E,F,G,H,J,K);
+  this_type= characterize_surf(A,B,C,G,H,J,K);
   CHECK_EQUAL(ELLIPTIC_CYL,this_type);
 
   
@@ -32,7 +32,7 @@ int main()
   G = 0.0; H = 0.0; J = 0.0;
   K = -1.0;
 
-  this_type= characterize_surf(A,B,C,D,E,F,G,H,J,K);
+  this_type= characterize_surf(A,B,C,G,H,J,K);
   CHECK_EQUAL(HYPERBOLIC_CYL,this_type);
 
 
@@ -43,7 +43,7 @@ int main()
   G = 0.0; H = 0.0; J = -1.0;
   K = 0.0;
 
-  this_type= characterize_surf(A,B,C,D,E,F,G,H,J,K);
+  this_type= characterize_surf(A,B,C,G,H,J,K);
   CHECK_EQUAL(ELLIPTIC_PARABOLOID,this_type);
 
   //Elliptic Cone
@@ -53,7 +53,7 @@ int main()
   G = 0.0; H = 0.0; J = 0.0;
   K = 0.0;
 
-  this_type= characterize_surf(A,B,C,D,E,F,G,H,J,K);
+  this_type= characterize_surf(A,B,C,G,H,J,K);
   CHECK_EQUAL(ELLIPTIC_CONE,this_type);
 
   //One Sheet Hyperpoloid
@@ -63,7 +63,7 @@ int main()
   G = 0.0; H = 0.0; J = 0.0;
   K = -1.0;
 
-  this_type= characterize_surf(A,B,C,D,E,F,G,H,J,K);
+  this_type= characterize_surf(A,B,C,G,H,J,K);
   CHECK_EQUAL(ONE_SHEET_HYPERBOLOID,this_type);
 
 
@@ -74,7 +74,7 @@ int main()
   G = 0.0; H = 0.0; J = 0.0;
   K = -1.0;
 
-  this_type= characterize_surf(A,B,C,D,E,F,G,H,J,K);
+  this_type= characterize_surf(A,B,C,G,H,J,K);
   CHECK_EQUAL(TWO_SHEET_HYPERBOLOID,this_type);
 
   //Hyperbolic paraboloid will go here someday...
