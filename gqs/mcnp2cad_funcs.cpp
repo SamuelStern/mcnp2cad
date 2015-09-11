@@ -24,14 +24,15 @@ std::ostream& operator<<(std::ostream& out, const GQ_TYPE value){
 std::map<GQ_TYPE,void (*)(double,double,double,double,double,double,double)>  gq_funcs()
 {
 std::map<GQ_TYPE, void (*)(double,double,double,double,double,double,double)> gq_map;
-
+ gq_map[UNKNOWN] = &not_supported;
+ gq_map[ELLIPSOID] = &not_supported;
  gq_map[ONE_SHEET_HYPERBOLOID]= &one_sheet_hyperboloid;
  gq_map[TWO_SHEET_HYPERBOLOID]= &two_sheet_hyperboloid;
- gq_map[ ELLIPTIC_CONE]= &elliptic_cone;
- gq_map[ ELLIPTIC_PARABOLOID]= &elliptic_paraboloid;
- gq_map[ ELLIPTIC_CYL]= &elliptic_cyl;
- gq_map[ HYPERBOLIC_CYL]= &hyperbolic_cyl;
- gq_map[ PARABOLIC_CYL]= &parabolic_cyl;
+ gq_map[ELLIPTIC_CONE]= &elliptic_cone;
+ gq_map[ELLIPTIC_PARABOLOID]= &elliptic_paraboloid;
+ gq_map[ELLIPTIC_CYL]= &elliptic_cyl;
+ gq_map[HYPERBOLIC_CYL]= &hyperbolic_cyl;
+ gq_map[PARABOLIC_CYL]= &parabolic_cyl;
 
   
   return gq_map;
@@ -51,20 +52,16 @@ GQ_TYPE characterize_surf( double A,
 {
 
   //first things first, complete the square to get the equation in the correct form
-  
-  double a,b,c,rhs,W;
-
-  complete_square(A,B,C,D,E,F,G,H,J,K,a,b,c,rhs,W);
-  
+  complete_square(A,B,C,G,H,J,K);
   if (false)
     {
-      std::cout << "a= " << a << std::endl;
+      std::cout << "a= " << A << std::endl;
       
-      std::cout << "b= " << b << std::endl;
+      std::cout << "b= " << B << std::endl;
       
-      std::cout << "c= " << c << std::endl;
+      std::cout << "c= " << C << std::endl;
       
-      std::cout << "rhs= " << rhs << std::endl;
+      std::cout << "rhs= " << -K << std::endl;
     }
 
   //now start to determine what kind of surface we have 
@@ -72,25 +69,17 @@ GQ_TYPE characterize_surf( double A,
   int num_neg = 0;
 
   //count negative coefficients
-  if ( a < 0 ) num_neg++;
-  if ( b < 0 ) num_neg++;
-  if ( c < 0 ) num_neg++;
+  if ( A < 0 ) num_neg++;
+  if ( B < 0 ) num_neg++;
+  if ( C < 0 ) num_neg++;
 
   //count zero coefficients
-  if ( a == 0) num_zero++;
-  if ( b == 0) num_zero++;
-  if ( c == 0) num_zero++;
+  if ( A == 0) num_zero++;
+  if ( B == 0) num_zero++;
+  if ( C == 0) num_zero++;
 
-
-  double g,h,j;
-  g = G; h = H; j = J;
-  if (W!=0)
-    {
-      g/=W;
-      h/=W;
-      j/=W;
-    }
-
+  int rhs = (int)-K;
+  
   if ( num_neg == 0 && num_zero == 0 && rhs)
     {
       //we already have a function for this
@@ -98,39 +87,39 @@ GQ_TYPE characterize_surf( double A,
     }
   else if ( num_neg == 1 && num_zero == 0 && rhs )
     {
-      one_sheet_hyperboloid( a, b, c, g, h, j, rhs );
+      //one_sheet_hyperboloid( a, b, c, g, h, j, rhs );
       return ONE_SHEET_HYPERBOLOID;
     }
   else if ( num_neg == 2 && num_zero == 0 && rhs )
     {
-      two_sheet_hyperboloid( a, b, c, g, h, j, rhs );
+      //two_sheet_hyperboloid( a, b, c, g, h, j, rhs );
       return TWO_SHEET_HYPERBOLOID;
     }
   else if ( num_neg == 1 && num_zero == 0 && !rhs )
     {
-      elliptic_cone( a, b, c, g, h, j, rhs );
+      //elliptic_cone( a, b, c, g, h, j, rhs );
       return ELLIPTIC_CONE;
     }
   else if ( num_neg == 0 && num_zero == 1 && !rhs )
     {
-      elliptic_paraboloid( a, b, c, g, h, j, rhs );
+      //elliptic_paraboloid( a, b, c, g, h, j, rhs );
       return ELLIPTIC_PARABOLOID;
     }
   else if ( num_neg == 1 && num_zero == 1 && !rhs )
     return HYPERBOLIC_PARABOLOID;
   else if ( num_neg == 0 && num_zero == 1 && rhs )
     {
-      elliptic_cyl(a,b,c,g,h,j,rhs);
+      //elliptic_cyl(a,b,c,g,h,j,rhs);
       return ELLIPTIC_CYL;
     }
   else if ( num_neg == 1 && num_zero == 1 && rhs )
     {
-      hyperbolic_cyl(a,b,c,g,h,j,rhs);
+      //hyperbolic_cyl(a,b,c,g,h,j,rhs);
       return HYPERBOLIC_CYL;
     }
   else if ( num_zero == 2 && !rhs )
     {
-      parabolic_cyl(a,b,c,g,h,j,rhs);
+      //parabolic_cyl(a,b,c,g,h,j,rhs);
       return PARABOLIC_CYL;
     }
 
@@ -140,23 +129,17 @@ GQ_TYPE characterize_surf( double A,
 }
 
 
-void complete_square ( double A,
-		       double B,
-		       double C, 
-		       double D, 
-		       double E,
-		       double F,
-		       double G, 
-		       double H, 
-		       double J,
-		       double K,
-		       double &a,
-		       double &b, 
-		       double &c, 
-		       double &rhs,
-		       double &W)
+void complete_square ( double &A,
+		       double &B,
+		       double &C, 
+		       double &G, 
+		       double &H, 
+		       double &J,
+		       double &K)
 {
 
+  double W;
+  
   W = -K;
   W += (A == 0) ? 0 : (G*G)/(4*A);
   W += (B == 0) ? 0 : (H*H)/(4*B);
@@ -165,13 +148,19 @@ void complete_square ( double A,
 
   double dum = ( W == 0 ) ? 1 : W;
 
-  a = A/dum;
+  A/=dum;
 
-  b = B/dum;
+  B/=dum;
   
-  c = C/dum;
+  C/=dum;
 
-  rhs = ( W == 0 ) ? 0 : 1;
+  G/=dum;
+
+  H/=dum;
+
+  J/=dum;
+
+  K = ( W == 0 ) ? 0 : -1;
 
   return;
 

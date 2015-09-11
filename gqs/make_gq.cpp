@@ -34,6 +34,9 @@ int main ( int argc, char** argv ) {
 
   po.parseCommandLine( argc, argv );
 
+  std::map<GQ_TYPE,void (*)(double,double,double,double,double,double,double)> gqs = gq_funcs();
+  
+
   //make sure this is actually a quadratic surface
   if ( A == 0 && B == 0 && C == 0 )
     {
@@ -48,9 +51,14 @@ int main ( int argc, char** argv ) {
       return 1;
     }
 
+
+  //complete the square on the second and first order terms
+  
+  
   //The first step is to characterize the surface
   GQ_TYPE type = characterize_surf(A,B,C,D,E,F,G,H,J,K);
-
+  gqs[type](A,B,C,G,H,J,K);
+  
   if (!type)
     {
       std::cout << "This GQ type is not yet supported. Exiting..." << std::endl;

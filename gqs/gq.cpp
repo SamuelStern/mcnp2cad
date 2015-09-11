@@ -19,6 +19,11 @@ GeometryQueryTool *gqt = GeometryQueryTool::instance();
 
 double large_val = 1e8;
 
+void not_supported( double a, double b, double c, double g, double h, double j, double k )
+{
+  std::cout << "This GQ is not suuported yet." << std::endl;
+}
+
 void elliptic_cone( double a, double b, double c, double g, double h, double j, double k )
 {
 
@@ -735,3 +740,5 @@ void hyperbolic_curves_in_plane( double a, double b, int symmetric_ax, int refle
     }
 
 }
+
+

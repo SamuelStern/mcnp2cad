@@ -11,14 +11,8 @@ int main()
   G = 0.0; H = -1.0; J = 0.0;
   K = 0.0;
 
-
   GQ_TYPE this_type= characterize_surf(A,B,C,D,E,F,G,H,J,K);
   CHECK_EQUAL(PARABOLIC_CYL, this_type);
-
-  DLIList<RefVolume*> vols;
-  gqt->ref_volumes(vols);
-
-  CHECK_EQUAL(1, (int)vols.size());
   
   //Elliptic Cylinder
   clean_cgma();

@@ -13,7 +13,7 @@
 extern GeometryModifyTool *gmt;
 extern GeometryQueryTool *gqt;
 
-
+void not_supported(double a, double b, double c, double g, double h, double j, double k);
 void elliptic_cone(double a, double b, double c, double g, double h, double j, double k);
 void elliptic_paraboloid(double a, double b, double c, double g, double h, double j, double k);
 void elliptic_cyl(double a, double b, double c, double g, double h, double j, double k);
