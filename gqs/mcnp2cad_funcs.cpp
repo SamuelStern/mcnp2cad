@@ -1,3 +1,5 @@
+#include "moab/CartVect.hpp"
+#include "moab/Matrix3.hpp"
 #include "mcnp2cad_funcs.hpp"
 
 
@@ -197,4 +199,26 @@ void get_translation( double A,
 
   return;
 
+}
+
+
+void rotate(double &A,
+	    double &B,
+	    double &C, 
+	    double &D, 
+	    double &E,
+	    double &F,
+	    double &alpha,
+	    double &beta,
+	    double &theta)
+{
+
+  
+
+
+
+
+
+
+  return;
 }
