@@ -202,22 +202,49 @@ void get_translation( double A,
 }
 
 
-void rotate(double &A,
-	    double &B,
-	    double &C, 
-	    double &D, 
-	    double &E,
-	    double &F,
-	    double &alpha,
-	    double &beta,
-	    double &theta)
+void get_rotation(double &A,
+		  double &B,
+		  double &C, 
+		  double &D, 
+		  double &E,
+		  double &F,
+		  double &alpha,
+		  double &beta,
+		  double &theta)
 {
-
   
+  
+  moab::Matrix3 coeff_mat(A,D/2,F/2,
+			  D/2,B,E/2,
+			  F/2,E/2,C);
+
+  double eigen_vals[3];
+
+  moab::CartVect eigen_vects[3];
+
+  moab::Matrix::EigenDecomp(coeff_mat,eigen_vals,eigen_vects);
+
+  moab::CartVect x_ax(1,0,0);
+  moab::CartVect y_ax(0,1,0);
+  moab::CartVect z_ax(0,0,1);
+  
+  A = eigen_vals[0];
+  B = eigen_vals[1];
+  C = eigen_vals[2];
+
+  //make sure we have unit vectors
+  eigen_vects[0].normalize();
+  eigen_vects[1].normalize();
+  eigen_vects[2].normalize();
 
 
-
-
+  //calculate angles of rotation
+  alpha = moab::angle(x_ax,eigen_vects[0]);
+  beta = moab::angle(y_ax,eigen_vects[1]);
+  theta = moab::angle(z_ax,eigen_vects[2]);
+  //make sure this system is right-handed
+  moab::CartVect new_z = eigen_vects[0]*eigen_vects[1];
+  if ( !(new_z==eigen_vects[2]) ) theta = 180;
 
 
   return;

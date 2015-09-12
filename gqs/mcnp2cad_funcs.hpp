@@ -48,3 +48,12 @@ void get_translation( double A,
 		      double &dx,
 		      double &dy, 
 		      double &dz);
+void get_rotation(double &A,
+		  double &B,
+		  double &C, 
+		  double &D, 
+		  double &E,
+		  double &F,
+		  double &alpha,
+		  double &beta,
+		  double &theta);
