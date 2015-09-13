@@ -5,7 +5,7 @@ include ${MOAB_MAKE}
 
 all: make_gq
 
-tests: test_hyperbolic_curves test_hyperbolic_curves_in_plane test_types
+tests: test_hyperbolic_curves test_hyperbolic_curves_in_plane test_types test_rotation
 
 check: tests
 	./run_tests | tee test-log.txt
@@ -25,5 +25,8 @@ test_hyperbolic_curves_in_plane:  ProgOptions.o
 test_types:  ProgOptions.o
 	g++ -g test_types.cpp gq.cpp mcnp2cad_funcs.cpp ProgOptions.o -o test_types $(CGM_INCLUDES) $(MOAB_INCLUDES) $(CGM_LIBS_LINK) $(MOAB_LIBS_LINK)
 
+test_rotation:  ProgOptions.o
+	g++ -g test_rotation.cpp gq.cpp mcnp2cad_funcs.cpp ProgOptions.o -o test_rotation $(CGM_INCLUDES) $(MOAB_INCLUDES) $(CGM_LIBS_LINK) $(MOAB_LIBS_LINK)
+
 clean:
-	rm make_gq test_hyperbolic_curves test_hyperbolic_curves_in_plane test_types  *.sat *.txt
+	rm make_gq test_hyperbolic_curves test_hyperbolic_curves_in_plane test_types test_rotation *.sat *.txt
