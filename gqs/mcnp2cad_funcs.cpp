@@ -233,15 +233,21 @@ void get_rotation(double &A,
   A = eigen_vals[0];
   B = eigen_vals[1];
   C = eigen_vals[2];
-
+  D = 0.0;
+  E = 0.0; 
+  F = 0.0;
   //make sure we have unit vectors
   eigen_vects[0].normalize();
   eigen_vects[1].normalize();
   eigen_vects[2].normalize();
 
   //calculate angles of rotation
-  alpha = moab::angle(x_ax,eigen_vects[0])*180/CUBIT_PI;
-  beta = moab::angle(y_ax,eigen_vects[1])*180/CUBIT_PI;
+  moab::CartVect xz_proj(eigen_vects[0][0],eigen_vects[0][1],0.0);
+  moab::CartVect xy_proj(eigen_vects[0][0],0.0,eigen_vects[0][2]);
+  moab::CartVect null_vec(0.0,0.0,0.0);
+
+  alpha = (xz_proj==null_vec) ? 90 : moab::angle(x_ax,xz_proj)*180/CUBIT_PI;
+  beta = (xy_proj==null_vec) ? 90 : moab::angle(y_ax,xy_proj)*180/CUBIT_PI;
 
   //make sure this system is right-handed
   moab::CartVect new_z = eigen_vects[0]*eigen_vects[1];
