@@ -209,11 +209,13 @@ void get_rotation(double &A,
 		  double &E,
 		  double &F,
 		  double &alpha,
-		  double &beta,
-		  double &theta)
+		  double &beta)
 {
-  
-  
+
+  //reset angles
+  alpha = 0.0;
+  beta = 0.0;
+
   moab::Matrix3 coeff_mat(A,D/2,F/2,
 			  D/2,B,E/2,
 			  F/2,E/2,C);
@@ -237,14 +239,14 @@ void get_rotation(double &A,
   eigen_vects[1].normalize();
   eigen_vects[2].normalize();
 
-
   //calculate angles of rotation
   alpha = moab::angle(x_ax,eigen_vects[0])*180/CUBIT_PI;
   beta = moab::angle(y_ax,eigen_vects[1])*180/CUBIT_PI;
-  theta = moab::angle(z_ax,eigen_vects[2])*180/CUBIT_PI;
+
   //make sure this system is right-handed
   moab::CartVect new_z = eigen_vects[0]*eigen_vects[1];
-  if ( !(new_z==eigen_vects[2]) ) theta = 180;
+  if ( !(new_z==eigen_vects[2]) ) alpha += 180;
+
 
 
   return;

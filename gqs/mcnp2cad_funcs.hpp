@@ -55,5 +55,4 @@ void get_rotation(double &A,
 		  double &E,
 		  double &F,
 		  double &alpha,
-		  double &beta,
-		  double &theta);
+		  double &beta);
