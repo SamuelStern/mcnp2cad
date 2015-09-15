@@ -280,14 +280,13 @@ void get_rotation(double &A,
   //calculate angles of rotation
   //angle about y axis
   theta = asin(P[2][0]);
-  phi = acos(P[2][2]/cos(theta));
-  alpha = acos(P[0][0]/cos(theta));
+  alpha = acos(P[2][2]/cos(theta));
+  phi = acos(P[0][0]/cos(theta));
 
+  //convert to degrees
+  alpha*=180/CUBIT_PI;
   theta*=180/CUBIT_PI;
   phi *= 180/CUBIT_PI;
-  alpha *=180/CUBIT_PI;
-
-
 
   moab::CartVect new_z = eigen_vects[0]*eigen_vects[1];
   if ( !(new_z==eigen_vects[2]) ) alpha += 180;
