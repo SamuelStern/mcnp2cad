@@ -5,7 +5,7 @@ int main()
 {
 
   double A,B,C,D,E,F,G,H,J,K; //coefficients
-  double y,z; //angles
+  double x,y,z; //angles
   
   //TEST 1 - Parabolic Cylinder
   A = 1.0; B = 1.0; C = 1.0;
@@ -13,7 +13,7 @@ int main()
   G = 0.0; H = 0.0; J = 0.0;
   K = 9.0;
 
-  get_rotation(A,B,C,D,E,F,y,z);
+  get_rotation(A,B,C,D,E,F,x,y,z);
 
   CHECK_REAL_EQUAL( 1.5, A, CHECK_TOLERANCE);
   CHECK_REAL_EQUAL( 0.5, B, CHECK_TOLERANCE);
@@ -28,8 +28,7 @@ int main()
   G = 0.0; H = 0.0; J = 0.0;
   K = -294.0;
 
-
-  get_rotation(A,B,C,D,E,F,y,z);
+  get_rotation(A,B,C,D,E,F,x,y,z);
 
   CHECK_REAL_EQUAL( 147 , A, CHECK_TOLERANCE);
   CHECK_REAL_EQUAL( 98, B, CHECK_TOLERANCE);
@@ -42,7 +41,7 @@ int main()
   G = 0.0; H = 0.0; J = 0.0;
   K = 9.0;
 
-  get_rotation(A,B,C,D,E,F,y,z);
+  get_rotation(A,B,C,D,E,F,x,y,z);
   CHECK_REAL_EQUAL( 1.0, A, CHECK_TOLERANCE);
   CHECK_REAL_EQUAL( 1.0, B, CHECK_TOLERANCE);
   CHECK_REAL_EQUAL( 1.0, C, CHECK_TOLERANCE);
@@ -56,7 +55,7 @@ int main()
   G = 0.0; H = 0.0; J = 0.0;
   K = 9.0;
 
-  get_rotation(A,B,C,D,E,F,y,z);
+  get_rotation(A,B,C,D,E,F,x,y,z);
 
   CHECK_REAL_EQUAL( 1.5, A, CHECK_TOLERANCE);
   CHECK_REAL_EQUAL( 0.5, B, CHECK_TOLERANCE);

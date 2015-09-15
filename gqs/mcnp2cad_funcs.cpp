@@ -209,12 +209,14 @@ void get_rotation(double &A,
 		  double &E,
 		  double &F,
 		  double &alpha,
-		  double &beta)
+		  double &theta,
+		  double &phi)
 {
 
   //reset angles
   alpha = 0.0;
-  beta = 0.0;
+  theta = 0.0;
+  phi = 0.0;
 
   moab::Matrix3 coeff_mat(A,D/2,F/2,
 			  D/2,B,E/2,
@@ -230,26 +232,63 @@ void get_rotation(double &A,
   moab::CartVect y_ax(0,1,0);
   moab::CartVect z_ax(0,0,1);
   
+  //make sure we have unit vectors
+  eigen_vects[0].normalize();
+  eigen_vects[1].normalize();
+  eigen_vects[2].normalize();
+
+
+  moab::Matrix3 P( eigen_vects[0][0], eigen_vects[1][0], eigen_vects[2][0],
+		   eigen_vects[0][1], eigen_vects[1][1], eigen_vects[2][1],
+		   eigen_vects[0][2], eigen_vects[1][2], eigen_vects[2][2]);
+
+  if ( P.determinant()-1.0 > 1e-6 ) //make sure we have a right-handed system
+    {
+
+      std::cout << "Trying new matrix..." << std::endl;
+      
+      moab::Matrix3 new_P( eigen_vects[0][0], eigen_vects[2][0], eigen_vects[1][0],
+			   eigen_vects[0][1], eigen_vects[2][1], eigen_vects[1][1],
+			   eigen_vects[0][2], eigen_vects[2][2], eigen_vects[1][2]);
+      
+      //if for some reason we can't achieve a right-handed system, exit
+
+      if ( new_P.determinant()-1.0 > 1e-6 )
+	{
+	  std::cout << "Could not orient new axes properly" << std::endl;
+	  exit(1);
+
+	}
+      //update Eigenvector matrix
+      P = new_P;
+     
+      //swap Eigenvalues
+      double temp = eigen_vals[2];
+      eigen_vals[2] = eigen_vals[1];
+      eigen_vals[1] = temp;
+      
+    }
+
+
   A = eigen_vals[0];
   B = eigen_vals[1];
   C = eigen_vals[2];
   D = 0.0;
   E = 0.0; 
   F = 0.0;
-  //make sure we have unit vectors
-  eigen_vects[0].normalize();
-  eigen_vects[1].normalize();
-  eigen_vects[2].normalize();
 
   //calculate angles of rotation
-  moab::CartVect xz_proj(eigen_vects[0][0],0.0,eigen_vects[0][2]);
-  moab::CartVect xy_proj(eigen_vects[0][0],eigen_vects[0][1],0.0);
-  moab::CartVect null_vec(0.0,0.0,0.0);
+  //angle about y axis
+  theta = asin(P[2][0]);
+  phi = acos(P[2][2]/cos(theta));
+  alpha = acos(P[0][0]/cos(theta));
 
-  alpha = (xz_proj==null_vec) ? 90 : moab::angle(x_ax,xz_proj)*180/CUBIT_PI;
-  beta = (xy_proj==null_vec) ? 90 : moab::angle(x_ax,xy_proj)*180/CUBIT_PI;
+  theta*=180/CUBIT_PI;
+  phi *= 180/CUBIT_PI;
+  alpha *=180/CUBIT_PI;
 
-  //make sure this system is right-handed
+
+
   moab::CartVect new_z = eigen_vects[0]*eigen_vects[1];
   if ( !(new_z==eigen_vects[2]) ) alpha += 180;
 

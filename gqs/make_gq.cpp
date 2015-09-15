@@ -57,8 +57,8 @@ int main ( int argc, char** argv ) {
   complete_square(A,B,C,G,H,J,K,dz,dy,dz);
 
 
-  double y_rot,z_rot;
-  get_rotation(A,B,C,D,E,F,y_rot,z_rot);
+  double x_rot,y_rot,z_rot;
+  get_rotation(A,B,C,D,E,F,x_rot,y_rot,z_rot);
 
   //The first step is to characterize the surface
   GQ_TYPE type = characterize_surf(A,B,C,G,H,J,K);
