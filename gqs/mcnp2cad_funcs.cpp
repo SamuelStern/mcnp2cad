@@ -238,21 +238,14 @@ void get_rotation(double &A,
   eigen_vects[2].normalize();
 
 
-  moab::Matrix3 P( eigen_vects[0][0], eigen_vects[1][0], eigen_vects[2][0],
-		   eigen_vects[0][1], eigen_vects[1][1], eigen_vects[2][1],
-		   eigen_vects[0][2], eigen_vects[1][2], eigen_vects[2][2]);
+  moab::Matrix3 P( eigen_vects[0], eigen_vects[1], eigen_vects[2] );
 
-  if ( P.determinant()-1.0 > 1e-6 ) //make sure we have a right-handed system
+  if ( fabs(P.determinant()-1.0) > 1e-6 ) //make sure we have a right-handed system
     {
 
-      std::cout << "Trying new matrix..." << std::endl;
-      
-      moab::Matrix3 new_P( eigen_vects[0][0], eigen_vects[2][0], eigen_vects[1][0],
-			   eigen_vects[0][1], eigen_vects[2][1], eigen_vects[1][1],
-			   eigen_vects[0][2], eigen_vects[2][2], eigen_vects[1][2]);
+      moab::Matrix3 new_P( eigen_vects[0], eigen_vects[2], eigen_vects[1]);
       
       //if for some reason we can't achieve a right-handed system, exit
-
       if ( new_P.determinant()-1.0 > 1e-6 )
 	{
 	  std::cout << "Could not orient new axes properly" << std::endl;
@@ -269,7 +262,6 @@ void get_rotation(double &A,
       
     }
 
-
   A = eigen_vals[0];
   B = eigen_vals[1];
   C = eigen_vals[2];
@@ -278,20 +270,19 @@ void get_rotation(double &A,
   F = 0.0;
 
   //calculate angles of rotation
+  P = P.transpose(); //transpose P to get the correct conversion
   //angle about y axis
-  theta = asin(P[2][0]);
-  alpha = acos(P[2][2]/cos(theta));
-  phi = acos(P[0][0]/cos(theta));
+  alpha = (P[2][2] == 0 ) ? CUBIT_PI/2 : atan(P[2][1]/P[2][2]);
+  phi =  (P[0][0] == 0 ) ? CUBIT_PI/2 : atan(P[1][0]/P[0][0]);  
+  theta =  (P[2][1] == 0 ) ? CUBIT_PI/2 : atan((-P[2][0]/P[2][1])*sin(alpha));
+  // theta = -asin(P[2][0]);
+  // alpha = acos(P[2][2]/cos(theta));
+  // phi = acos(P[0][0]/cos(theta));
 
   //convert to degrees
   alpha*=180/CUBIT_PI;
   theta*=180/CUBIT_PI;
   phi *= 180/CUBIT_PI;
-
-  moab::CartVect new_z = eigen_vects[0]*eigen_vects[1];
-  if ( !(new_z==eigen_vects[2]) ) alpha += 180;
-
-
 
   return;
 }

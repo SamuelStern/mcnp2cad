@@ -21,7 +21,7 @@ int main()
   CHECK_REAL_EQUAL( 9.0, K, CHECK_TOLERANCE);
   CHECK_REAL_EQUAL( 0.0, y, CHECK_TOLERANCE);
   CHECK_REAL_EQUAL( 45.0, z, CHECK_TOLERANCE);
-
+  
   ///TEST 2 - Ellipsoid
   A = 103.0; B = 125.0; C = 66.0;
   D = -48.0; E = -60.0; F = -12.0;
@@ -34,10 +34,10 @@ int main()
   CHECK_REAL_EQUAL( 98, B, CHECK_TOLERANCE);
   CHECK_REAL_EQUAL( 49, C, CHECK_TOLERANCE);
   CHECK_REAL_EQUAL( -294, K, CHECK_TOLERANCE);
-  CHECK_REAL_EQUAL( 26.56575, x, CHECK_TOLERANCE);
-  CHECK_REAL_EQUAL( 16.6015, y, CHECK_TOLERANCE);
-  CHECK_REAL_EQUAL( 63.434, z, CHECK_TOLERANCE);
-
+  CHECK_REAL_EQUAL( -26.56575, x, CHECK_TOLERANCE);
+  CHECK_REAL_EQUAL( -16.60155, y, CHECK_TOLERANCE);
+  CHECK_REAL_EQUAL( -63.434949, z, CHECK_TOLERANCE);
+  
   //TEST 3 - No rotation (for robustness)
   A = 1.0; B = 1.0; C = 1.0;
   D = 0.0; E = 0.0; F = 0.0;
@@ -68,6 +68,15 @@ int main()
   CHECK_REAL_EQUAL( 0.0, x, CHECK_TOLERANCE);
   CHECK_REAL_EQUAL( 0.0, y, CHECK_TOLERANCE);
   CHECK_REAL_EQUAL( -45.0, z, CHECK_TOLERANCE);
+
+  //TEST 5 - Cone
+  A = 3.0; B = 3.0; C = -.0;
+  D = 2; E = 0.0; F = 0.0;
+  G = 0.0; H = 0.0; J = 0.0;
+  K = 0.0;
+
+  get_rotation(A,B,C,D,E,F,x,y,z);
+
 
 
   //if we get to this point, all of the tests have passed

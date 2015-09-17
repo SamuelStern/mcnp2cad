@@ -2,7 +2,7 @@
 #include "gq.hpp"
 #include "mcnp2cad_funcs.hpp"
 
-#define CHECK_TOLERANCE 1e-6
+#define CHECK_TOLERANCE 1e-5
 
 #define FLAG_ERROR exit(1)
 
