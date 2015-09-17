@@ -22,7 +22,7 @@ inline void flag_error() { FLAG_ERROR; }
 
 bool check_equal(int A, int B, int line) { EQUAL_TEST( A == B, d) };
 bool check_equal(double A, double B, int line) { EQUAL_TEST( A == B, f) };
-bool check_equal(double A, double B, double eps, int line) { EQUAL_TEST( (A-B < eps), f ) };
+bool check_equal(double A, double B, double eps, int line) { EQUAL_TEST( (fabs(A-B) < eps), f ) };
 bool check_CubitVectors_equal( CubitVector A, CubitVector B, const char* Aname, const char* Bname, int line ) 
 {
 if ( (A[0] - B[0] > CHECK_TOLERANCE) || ( A[1] - B[1] > CHECK_TOLERANCE ) || (A[2] - B[2] > CHECK_TOLERANCE ) )

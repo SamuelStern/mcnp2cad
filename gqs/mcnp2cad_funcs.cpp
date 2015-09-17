@@ -271,13 +271,21 @@ void get_rotation(double &A,
 
   //calculate angles of rotation
   P = P.transpose(); //transpose P to get the correct conversion
-  //angle about y axis
-  alpha = (P[2][2] == 0 ) ? CUBIT_PI/2 : atan(P[2][1]/P[2][2]);
-  phi =  (P[0][0] == 0 ) ? CUBIT_PI/2 : atan(P[1][0]/P[0][0]);  
-  theta =  (P[2][1] == 0 ) ? CUBIT_PI/2 : atan((-P[2][0]/P[2][1])*sin(alpha));
-  // theta = -asin(P[2][0]);
-  // alpha = acos(P[2][2]/cos(theta));
-  // phi = acos(P[0][0]/cos(theta));
+
+
+  //attempt the simple solution first
+  theta = -asin(P[2][0]);
+  if ( fabs(cos(theta)) > 1.0e-8 )
+    {
+      alpha = atan2(P[2][1]/cos(theta),P[2][2]/cos(theta));
+      phi = atan2(P[1][0]/cos(theta),P[0][0]/cos(theta));
+    }
+  else
+    {
+      phi = 0; //arbitrary value
+      theta = ( P[1][1] == P[0][2] ) ? CUBIT_PI/2 : -CUBIT_PI/2;
+      alpha = ( P[1][1] == P[0][2] ) ? atan2(P[0][1],P[0][2]) : atan2(-P[0][1],-P[0][2]);
+    }
 
   //convert to degrees
   alpha*=180/CUBIT_PI;
