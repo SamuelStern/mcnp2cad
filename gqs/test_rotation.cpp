@@ -71,7 +71,7 @@ int main()
   CHECK_REAL_EQUAL( -45.0, z, CHECK_TOLERANCE);
 
   //TEST 5 - Cone
-  A = 3.0; B = 3.0; C = -.0;
+  A = 3.0; B = 3.0; C = -1.0;
   D = 2; E = 0.0; F = 0.0;
   G = 0.0; H = 0.0; J = 0.0;
   K = 0.0;
@@ -82,7 +82,10 @@ int main()
   CHECK_REAL_EQUAL( -1.0, B, CHECK_TOLERANCE);
   CHECK_REAL_EQUAL( 2.0, C, CHECK_TOLERANCE);
   CHECK_REAL_EQUAL( 0.0, K, CHECK_TOLERANCE);
-
+  CHECK_REAL_EQUAL( 90.0, x, CHECK_TOLERANCE);
+  CHECK_REAL_EQUAL( 0.0, y, CHECK_TOLERANCE);
+  CHECK_REAL_EQUAL( 45.0, z, CHECK_TOLERANCE);
+ 
   
 
   //if we get to this point, all of the tests have passed
