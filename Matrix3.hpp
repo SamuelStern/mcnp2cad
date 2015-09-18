@@ -23,10 +23,13 @@
 #ifndef MOAB_MATRIX3_HPP
 #define MOAB_MATRIX3_HPP
 
-#include "moab/Types.hpp"
-#include <iostream>
-#include "moab/CartVect.hpp"
 
+#ifndef GEOMETRY_H
+#include "geometry.hpp"
+#define GEOMETRY_H
+#endif
+
+#include <iostream>
 #include <iosfwd>
 #include <limits>
 #include <float.h>
@@ -108,17 +111,17 @@ namespace Matrix{
 	
 	template< typename Vector, typename Matrix>
 	inline Vector vector_matrix( const Vector& v, const Matrix& m ) {
-	  return Vector( v[0] * m(0,0) + v[1] * m(1,0) + v[2] * m(2,0),
-	                 v[0] * m(0,1) + v[1] * m(1,1) + v[2] * m(2,1),
-	                 v[0] * m(0,2) + v[1] * m(1,2) + v[2] * m(2,2) );
+	  return Vector( v.v[0] * m(0,0) + v.v[1] * m(1,0) + v.v[2] * m(2,0),
+	                 v.v[0] * m(0,1) + v.v[1] * m(1,1) + v.v[2] * m(2,1),
+	                 v.v[0] * m(0,2) + v.v[1] * m(1,2) + v.v[2] * m(2,2) );
 	}
 	
 	template< typename Vector, typename Matrix>
 	inline Vector matrix_vector( const Matrix& m, const Vector& v ){
 	   Vector res = v;
-	   res[ 0] = v[0] * m(0,0) + v[1] * m(0,1) + v[2] * m(0,2);
-	   res[ 1] = v[0] * m(1,0) + v[1] * m(1,1) + v[2] * m(1,2);
-	   res[ 2] = v[0] * m(2,0) + v[1] * m(2,1) + v[2] * m(2,2);
+	   res.v[ 0] = v.v[0] * m(0,0) + v.v[1] * m(0,1) + v.v[2] * m(0,2);
+	   res.v[ 1] = v.v[0] * m(1,0) + v.v[1] * m(1,1) + v.v[2] * m(1,2);
+	   res.v[ 2] = v.v[0] * m(2,0) + v.v[1] * m(2,1) + v.v[2] * m(2,2);
 	   return res;
 	} 
 
@@ -139,7 +142,7 @@ namespace Matrix{
 	//automatically inlines them.
 
 	template< typename Matrix, typename Vector>
-	ErrorCode EigenDecomp( const Matrix & _a,
+	int EigenDecomp( const Matrix & _a,
 	                       double w[3],
 	                       Vector o[3] ) {
 	  Vector v[3];
@@ -219,7 +222,7 @@ namespace Matrix{
 	  //// this is NEVER called
 	  if ( i >= MAX_ROTATIONS ) {
 	      std::cerr << "Matrix3D: Error extracting eigenfunctions" << std::endl;
-	      return MB_FAILURE;
+	      return 1;
 	  }
 
 	  // sort eigenfunctions                 these changes do not affect accuracy
@@ -264,7 +267,7 @@ namespace Matrix{
 	      { o[i][j]=v[j][i]; }
 	    }
 
-	  return MB_SUCCESS;
+	  return 0;
 	}
 } //namespace Matrix
 
@@ -284,10 +287,10 @@ public:
       d[1] = d[2] = d[3] = 0.0;
       d[5] = d[6] = d[7] = 0.0;
   }
-  inline Matrix3( const CartVect & diagonal ){ 
-      d[0] = diagonal[0];
-      d[4] = diagonal[1],
-      d[8] = diagonal[2];
+  inline Matrix3( const Vector3d & diagonal ){ 
+      d[0] = diagonal.v[0];
+      d[4] = diagonal.v[1],
+      d[8] = diagonal.v[2];
       d[1] = d[2] = d[3] = 0.0;
       d[5] = d[6] = d[7] = 0.0;
   }
@@ -465,11 +468,11 @@ inline std::vector< T> operator*( const std::vector< T>& v, const Matrix3&m){
 		return moab::Matrix::vector_matrix( v, m);
 }
 
-inline CartVect operator*( const Matrix3&m,  const CartVect& v){
+inline Vector3d operator*( const Matrix3&m,  const Vector3d& v){
 		return moab::Matrix::matrix_vector( m, v);
 }
 
-inline CartVect operator*( const CartVect& v, const Matrix3& m){
+inline Vector3d operator*( const Vector3d& v, const Matrix3& m){
 		return moab::Matrix::vector_matrix( v, m);
 }
 

@@ -4,9 +4,15 @@
 
 #include <cassert>
 
+
+#ifndef GEOMETRY_H
+#define GEOMETRY_H
+#include "geometry.hpp"
+#endif
+#include "Matrix3.hpp"
+
 #include "MCNPInput.hpp"
 #include "volumes.hpp"
-#include "geometry.hpp"
 #include "options.hpp"
 
 
