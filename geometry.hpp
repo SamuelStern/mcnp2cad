@@ -54,6 +54,14 @@ public:
     return Vector3d(-v[0], -v[1], -v[2]);
   }
 
+  double operator[](unsigned i) const {
+    return v[i];
+  }
+
+  double& operator[](unsigned i) {
+    return v[i];
+  }
+
   Vector3d reverse() const { 
     return -(*this);
   }

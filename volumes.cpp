@@ -336,7 +336,8 @@ class GeneralQuadraticSurface : public SurfaceVolume {
 
 protected:
   double A,B,C,D,E,F,G,H,J,K;
-
+  Vector3d translation;
+  double rotation_mat[9];
 public:
   GeneralQuadraticSurface( double _A, 
 			   double _B,
@@ -353,11 +354,97 @@ public:
 
 protected:
 
+  void set_translation()  {
+    
+    double dx,dy,dz;
+
+    dx = (A == 0) ? 0 : G/(2*A);
+    dy = (B == 0) ? 0 : H/(2*B);
+    dz = (C == 0) ? 0 : J/(2*C);
+
+    if ( G/A < 0 ) dx *= -1;
+    if ( H/B < 0 ) dy *= -1;
+    if ( J/C < 0 ) dz *= -1;
+    
+    translation = Vector3d(dx,dy,dz);
+
+    return;
+
+  }
+
+
+  void set_rotation()
+  {
+
+   
+    Matrix3 coeff_mat(A,D/2,F/2,
+			    D/2,B,E/2,
+			    F/2,E/2,C);
+
+    double eigen_vals[3];
+
+    Vector3d eigen_vects[3];
+
+    Matrix::EigenDecomp(coeff_mat,eigen_vals,eigen_vects);
+
+    Vector3d x_ax(1,0,0);
+    Vector3d y_ax(0,1,0);
+    Vector3d z_ax(0,0,1);
+  
+    //make sure we have unit vectors
+    eigen_vects[0].normalize();
+    eigen_vects[1].normalize();
+    eigen_vects[2].normalize();
+
+
+    Matrix3 P( eigen_vects[0], eigen_vects[1], eigen_vects[2] );
+
+    if ( fabs(P.determinant()-1.0) > 1e-6 ) //make sure we have a right-handed system
+      {
+
+	Matrix3 new_P( eigen_vects[0], eigen_vects[2], eigen_vects[1]);
+      
+	//if for some reason we can't achieve a right-handed system, exit
+	if ( new_P.determinant()-1.0 > 1e-6 )
+	  {
+	    std::cout << "Could not orient new axes properly" << std::endl;
+	    exit(1);
+
+	  }
+	//update Eigenvector matrix
+	P = new_P;
+     
+	//swap Eigenvalues
+	double temp = eigen_vals[2];
+	eigen_vals[2] = eigen_vals[1];
+	eigen_vals[1] = temp;
+      
+      }
+
+    A = eigen_vals[0];
+    B = eigen_vals[1];
+    C = eigen_vals[2];
+    D = 0.0;
+    E = 0.0; 
+    F = 0.0;
+
+    //calculate angles of rotation
+    P = P.transpose(); //transpose P to get the correct conversion
+
+    std::copy(P.array(), P.array()+9, rotation_mat);
+  }
+
+  
   virtual iBase_EntityHandle getHandle( bool positive, iGeom_Instance& igm, double world_size )
   { 
 
-    //code for creation of canonical form goes here
+    set_translation();
     
+    set_rotation();
+
+
+
+    //code for creation of canonical form goes here
     iBase_EntityHandle dum_handle; return dum_handle;
   }
 

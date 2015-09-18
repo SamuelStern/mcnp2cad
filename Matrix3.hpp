@@ -38,8 +38,6 @@
 # define finite _finite
 #endif
 
-namespace moab {
-
 namespace Matrix{
 	template< typename Matrix>
 	Matrix inverse( const Matrix & d, const double i){
@@ -111,17 +109,17 @@ namespace Matrix{
 	
 	template< typename Vector, typename Matrix>
 	inline Vector vector_matrix( const Vector& v, const Matrix& m ) {
-	  return Vector( v.v[0] * m(0,0) + v.v[1] * m(1,0) + v.v[2] * m(2,0),
-	                 v.v[0] * m(0,1) + v.v[1] * m(1,1) + v.v[2] * m(2,1),
-	                 v.v[0] * m(0,2) + v.v[1] * m(1,2) + v.v[2] * m(2,2) );
+	  return Vector( v[0] * m(0,0) + v[1] * m(1,0) + v[2] * m(2,0),
+	                 v[0] * m(0,1) + v[1] * m(1,1) + v[2] * m(2,1),
+	                 v[0] * m(0,2) + v[1] * m(1,2) + v[2] * m(2,2) );
 	}
 	
 	template< typename Vector, typename Matrix>
 	inline Vector matrix_vector( const Matrix& m, const Vector& v ){
 	   Vector res = v;
-	   res.v[ 0] = v.v[0] * m(0,0) + v.v[1] * m(0,1) + v.v[2] * m(0,2);
-	   res.v[ 1] = v.v[0] * m(1,0) + v.v[1] * m(1,1) + v.v[2] * m(1,2);
-	   res.v[ 2] = v.v[0] * m(2,0) + v.v[1] * m(2,1) + v.v[2] * m(2,2);
+	   res[ 0] = v[0] * m(0,0) + v[1] * m(0,1) + v[2] * m(0,2);
+	   res[ 1] = v[0] * m(1,0) + v[1] * m(1,1) + v[2] * m(1,2);
+	   res[ 2] = v[0] * m(2,0) + v[1] * m(2,1) + v[2] * m(2,2);
 	   return res;
 	} 
 
@@ -288,9 +286,9 @@ public:
       d[5] = d[6] = d[7] = 0.0;
   }
   inline Matrix3( const Vector3d & diagonal ){ 
-      d[0] = diagonal.v[0];
-      d[4] = diagonal.v[1],
-      d[8] = diagonal.v[2];
+      d[0] = diagonal[0];
+      d[4] = diagonal[1],
+      d[8] = diagonal[2];
       d[1] = d[2] = d[3] = 0.0;
       d[5] = d[6] = d[7] = 0.0;
   }
@@ -394,20 +392,20 @@ inline Matrix3( double v00, double v01, double v02,
   }
  
   inline Matrix3& operator*=( const Matrix3& m ){
-	(*this) = moab::Matrix::mmult3((*this),m); 
+	(*this) = Matrix::mmult3((*this),m); 
 	return *this;
   }
   
   inline double determinant() const{
-  	return moab::Matrix::determinant3( *this);
+  	return Matrix::determinant3( *this);
   }
  
   inline Matrix3 inverse() const { 
 	const double i = 1.0/determinant();
-	return moab::Matrix::inverse( *this, i); 
+	return Matrix::inverse( *this, i); 
   }
   inline Matrix3 inverse( double i ) const {
-  	return moab::Matrix::inverse( *this, i); 
+  	return Matrix::inverse( *this, i); 
   }
   
   inline bool positive_definite() const{
@@ -416,10 +414,10 @@ inline Matrix3( double v00, double v01, double v02,
   }
   
   inline bool positive_definite( double& det ) const{
-	  return moab::Matrix::positive_definite( *this, det);
+	  return Matrix::positive_definite( *this, det);
   }
   
-  inline Matrix3 transpose() const{ return moab::Matrix::transpose( *this); }
+  inline Matrix3 transpose() const{ return Matrix::transpose( *this); }
   
   inline bool invert() {
     double i = 1.0 / determinant();
@@ -447,7 +445,7 @@ inline Matrix3 operator-( const Matrix3& a, const Matrix3& b ){
 }
 
 inline Matrix3 operator*( const Matrix3& a, const Matrix3& b ) {
-	return moab::Matrix::mmult3( a, b);
+	return Matrix::mmult3( a, b);
 }
 
 template< typename Vector>
@@ -460,27 +458,26 @@ inline Matrix3 outer_product( const Vector & u,
 
 template< typename T>
 inline std::vector< T> operator*( const Matrix3&m, const std::vector< T> & v){
-		return moab::Matrix::matrix_vector( m, v);
+		return Matrix::matrix_vector( m, v);
 }
 
 template< typename T>
 inline std::vector< T> operator*( const std::vector< T>& v, const Matrix3&m){
-		return moab::Matrix::vector_matrix( v, m);
+		return Matrix::vector_matrix( v, m);
 }
 
 inline Vector3d operator*( const Matrix3&m,  const Vector3d& v){
-		return moab::Matrix::matrix_vector( m, v);
+		return Matrix::matrix_vector( m, v);
 }
 
 inline Vector3d operator*( const Vector3d& v, const Matrix3& m){
-		return moab::Matrix::vector_matrix( v, m);
+		return Matrix::vector_matrix( v, m);
 }
 
-} // namespace moab
 
 #ifndef MOAB_MATRIX3_OPERATORLESS
 #define MOAB_MATRIX3_OPERATORLESS
-inline std::ostream& operator<<( std::ostream& s, const moab::Matrix3& m ){
+inline std::ostream& operator<<( std::ostream& s, const Matrix3& m ){
   return s <<  "| " << m(0,0) << " " << m(0,1) << " " << m(0,2) 
            << " | " << m(1,0) << " " << m(1,1) << " " << m(1,2) 
            << " | " << m(2,0) << " " << m(2,1) << " " << m(2,2) 
