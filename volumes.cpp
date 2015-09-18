@@ -325,6 +325,39 @@ protected:
 
 #endif /* HAVE_IGEOM_CONE */
 
+
+class GeneralQuadraticSurface : public SurfaceVolume {
+
+protected:
+  double A,B,C,D,E,F,G,H,J,K;
+
+public:
+  GeneralQuadraticSurface( double _A, 
+			   double _B,
+			   double _C,
+			   double _D,
+			   double _E,
+			   double _F,
+			   double _G,
+			   double _H,
+			   double _J,
+			   double _K ) :
+    A(_A),B(_B),C(_C),D(_D),E(_E),F(_F),G(_G),H(_H),J(_J),K(_K)
+  {}
+
+protected:
+
+  virtual iBase_EntityHandle getHandle( bool positive, iGeom_Instance& igm, double world_size )
+  { 
+
+    //code for creation of canonical form goes here
+    
+    iBase_EntityHandle dum_handle; return dum_handle;
+  }
+
+};
+
+
 class TorusSurface : public SurfaceVolume {
 
 protected:
