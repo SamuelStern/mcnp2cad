@@ -356,8 +356,30 @@ protected:
 
   void set_translation()  {
     
-    double dx,dy,dz;
+    double dx,dy,dz,W;
+  
+    W = -K;
+    W += (A == 0) ? 0 : (G*G)/(4*A);
+    W += (B == 0) ? 0 : (H*H)/(4*B);
+    W += (C == 0) ? 0 : (J*J)/(4*C);
 
+
+    double dum = ( W == 0 ) ? 1 : W;
+
+    A/=dum;
+
+    B/=dum;
+  
+    C/=dum;
+
+    G/=dum;
+
+    H/=dum;
+
+    J/=dum;
+
+    K = ( W == 0 ) ? 0 : -1;
+  
     dx = (A == 0) ? 0 : G/(2*A);
     dy = (B == 0) ? 0 : H/(2*B);
     dz = (C == 0) ? 0 : J/(2*C);
@@ -443,7 +465,7 @@ protected:
     set_rotation();
 
 
-
+    
     //code for creation of canonical form goes here
     iBase_EntityHandle dum_handle; return dum_handle;
   }
