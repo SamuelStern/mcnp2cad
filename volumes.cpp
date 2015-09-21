@@ -351,7 +351,9 @@ public:
 			   double _J,
 			   double _K ) :
     A(_A),B(_B),C(_C),D(_D),E(_E),F(_F),G(_G),H(_H),J(_J),K(_K)
-  {}
+  {     set_translation();
+        set_rotation();
+  }
 
 protected:
 
@@ -464,11 +466,6 @@ protected:
   
   virtual iBase_EntityHandle getHandle( bool positive, iGeom_Instance& igm, double world_size )
   { 
-
-    set_translation();
-    
-    set_rotation();
-    
 
     iBase_EntityHandle gq_handle;
     int igm_result=0;
