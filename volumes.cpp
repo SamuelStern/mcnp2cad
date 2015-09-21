@@ -474,8 +474,10 @@ protected:
     int igm_result=0;
     iGeom_GQ(igm,A,B,C,D,E,F,G,H,J,K,&gq_handle,&igm_result);
 
+    Transform gq_transform(rotation_mat,translation);
+
     //move back to original orientation
-    //applyReverseTransform( rotation_mat, translation, ent);
+    applyReverseTransform( gq_transform, igm, gq_handle);
 
     double xmin,xmax,ymin,ymax,zmin,zmax;
     iGeom_getBoundBox(igm,&xmin,&ymin,&zmin,&xmax,&ymax,&zmax,&igm_result);
