@@ -417,7 +417,7 @@ protected:
     eigen_vects[0].normalize();
     eigen_vects[1].normalize();
     eigen_vects[2].normalize();
-
+    
 
     Matrix3 P( eigen_vects[0], eigen_vects[1], eigen_vects[2] );
 
@@ -451,8 +451,9 @@ protected:
     F = 0.0;
 
     //calculate angles of rotation
-    P = P.transpose(); //transpose P to get the correct conversion
+    //P = P.transpose(); //transpose P to get the correct conversion
 
+    //populate the rotation matrix
     std::copy(P.array(), P.array()+9, rotation_mat);
   }
 
@@ -463,11 +464,17 @@ protected:
     set_translation();
     
     set_rotation();
+    
 
+    iBase_EntityHandle gq_handle;
+    int igm_result;
+    iGeom_GQ(igm,A,B,C,D,E,F,G,H,J,K,&gq_handle,&igm_result);
+
+    //move back to original orientation
+    //applyReverseTransform( rotation_mat, translation, ent);
 
     
-    //code for creation of canonical form goes here
-    iBase_EntityHandle dum_handle; return dum_handle;
+    return gq_handle;
   }
 
 };
