@@ -338,6 +338,7 @@ protected:
   double A,B,C,D,E,F,G,H,J,K;
   Vector3d translation;
   double rotation_mat[9];
+  double extents[3];
 public:
   GeneralQuadraticSurface( double _A, 
 			   double _B,
@@ -457,6 +458,9 @@ protected:
     std::copy(P.array(), P.array()+9, rotation_mat);
   }
 
+  virtual double getFarthestExtentFromOrigin ( ) const {
+    return sqrt( extents[0]*extents[0] + extents[1]*extents[1] + extents[2]*extents[2]);
+  }
   
   virtual iBase_EntityHandle getHandle( bool positive, iGeom_Instance& igm, double world_size )
   { 
@@ -467,11 +471,18 @@ protected:
     
 
     iBase_EntityHandle gq_handle;
-    int igm_result;
+    int igm_result=0;
     iGeom_GQ(igm,A,B,C,D,E,F,G,H,J,K,&gq_handle,&igm_result);
 
     //move back to original orientation
     //applyReverseTransform( rotation_mat, translation, ent);
+
+    double xmin,xmax,ymin,ymax,zmin,zmax;
+    iGeom_getBoundBox(igm,&xmin,&ymin,&zmin,&xmax,&ymax,&zmax,&igm_result);
+    extents[0] = ( fabs(xmin) > fabs(xmax) ) ? xmin : xmax;
+    extents[1] = ( fabs(ymin) > fabs(ymax) ) ? ymin : ymax;
+    extents[2] = ( fabs(zmin) > fabs(zmax) ) ? zmin : zmax;
+
 
     
     return gq_handle;
@@ -1190,6 +1201,9 @@ SurfaceVolume& makeSurface( const SurfaceCard* card, VolumeCache* v){
         throw std::runtime_error( mnemonic + " is only a supported surface with 2 or 4 arguments" );
         break;
       }
+    }
+    else if( mnemonic == "gq" ) {
+      surface = new GeneralQuadraticSurface(args.at(0), args.at(1), args.at(2), args.at(3), args.at(4), args.at(5), args.at(6), args.at(7), args.at(8), args.at(9));
     }
     else{
       throw std::runtime_error( mnemonic + " is not a supported surface" );
