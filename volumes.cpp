@@ -403,8 +403,8 @@ protected:
 
    
     Matrix3 coeff_mat(A,D/2,F/2,
-			    D/2,B,E/2,
-			    F/2,E/2,C);
+		      D/2,B,E/2,
+		      F/2,E/2,C);
 
     double eigen_vals[3];
 
@@ -470,6 +470,7 @@ protected:
     iBase_EntityHandle gq_handle;
     int igm_result=0;
     iGeom_GQ(igm,A,B,C,D,E,F,G,H,J,K,&gq_handle,&igm_result);
+    CHECK_IGEOM( igm_result, "Creating intial GQ");
 
     Transform gq_transform(rotation_mat,translation);
 
@@ -482,8 +483,6 @@ protected:
     extents[1] = ( fabs(ymin) > fabs(ymax) ) ? ymin : ymax;
     extents[2] = ( fabs(zmin) > fabs(zmax) ) ? zmin : zmax;
 
-
-    
     return gq_handle;
   }
 
