@@ -453,6 +453,8 @@ protected:
     E = 0.0; 
     F = 0.0;
 
+   
+
     //calculate angles of rotation
     //P = P.transpose(); //transpose P to get the correct conversion
 
@@ -467,9 +469,20 @@ protected:
   virtual iBase_EntityHandle getHandle( bool positive, iGeom_Instance& igm, double world_size )
   { 
 
+    std::cout << "Final Coeffs of GQ" << std::endl;
+
+    std::cout << "A= " << A << std::endl;
+    std::cout << "B= " << B << std::endl;
+    std::cout << "C= " << C << std::endl;
+    std::cout << "D= " << D << std::endl;
+    std::cout << "E= " << E << std::endl;
+    std::cout << "F= " << F << std::endl;
+    std::cout << "K= " << K << std::endl;
+
+
     iBase_EntityHandle gq_handle;
     int igm_result=0;
-    iGeom_GQ(igm,A,B,C,D,E,F,G,H,J,K,&gq_handle,&igm_result);
+    iGeom_GQ(igm,A,B,C,D,E,F,G,H,J,K,world_size,&gq_handle,&igm_result);
     CHECK_IGEOM( igm_result, "Creating intial GQ");
 
     Transform gq_transform(rotation_mat,translation);
