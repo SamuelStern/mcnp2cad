@@ -332,32 +332,8 @@ protected:
 #endif /* HAVE_IGEOM_CONE */
 
 
-class GeneralQuadraticSurface : public SurfaceVolume {
 
-protected:
-  double A,B,C,D,E,F,G,H,J,K;
-  Vector3d translation;
-  double rotation_mat[9];
-  double extents[3];
-public:
-  GeneralQuadraticSurface( double _A, 
-			   double _B,
-			   double _C,
-			   double _D,
-			   double _E,
-			   double _F,
-			   double _G,
-			   double _H,
-			   double _J,
-			   double _K ) :
-    A(_A),B(_B),C(_C),D(_D),E(_E),F(_F),G(_G),H(_H),J(_J),K(_K)
-  {     set_translation();
-        set_rotation();
-  }
-
-protected:
-
-  void set_translation()  {
+void GeneralQuadraticSurface::set_translation()  {
     
     double dx,dy,dz,W;
   
@@ -398,108 +374,70 @@ protected:
   }
 
 
-  void set_rotation()
-  {
+void GeneralQuadraticSurface::set_rotation()
+{
 
+  if ( D == 0 && E == 0 && F == 0 ) return;
    
-    Matrix3 coeff_mat(A,D/2,F/2,
-		      D/2,B,E/2,
-		      F/2,E/2,C);
+  Matrix3 coeff_mat(A,D/2,F/2,
+		    D/2,B,E/2,
+		    F/2,E/2,C);
 
-    double eigen_vals[3];
+  double eigen_vals[3];
 
-    Vector3d eigen_vects[3];
+  Vector3d eigen_vects[3];
 
-    Matrix::EigenDecomp(coeff_mat,eigen_vals,eigen_vects);
+  Matrix::EigenDecomp(coeff_mat,eigen_vals,eigen_vects);
 
-    Vector3d x_ax(1,0,0);
-    Vector3d y_ax(0,1,0);
-    Vector3d z_ax(0,0,1);
+  Vector3d x_ax(1,0,0);
+  Vector3d y_ax(0,1,0);
+  Vector3d z_ax(0,0,1);
   
-    //make sure we have unit vectors
-    eigen_vects[0].normalize();
-    eigen_vects[1].normalize();
-    eigen_vects[2].normalize();
+  //make sure we have unit vectors
+  eigen_vects[0].normalize();
+  eigen_vects[1].normalize();
+  eigen_vects[2].normalize();
     
 
-    Matrix3 P( eigen_vects[0], eigen_vects[1], eigen_vects[2] );
+  Matrix3 P( eigen_vects[0], eigen_vects[1], eigen_vects[2] );
 
-    if ( fabs(P.determinant()-1.0) > 1e-6 ) //make sure we have a right-handed system
-      {
+  if ( fabs(P.determinant()-1.0) > 1e-6 ) //make sure we have a right-handed system
+    {
 
-	Matrix3 new_P( eigen_vects[0], eigen_vects[2], eigen_vects[1]);
+      Matrix3 new_P( eigen_vects[0], eigen_vects[2], eigen_vects[1]);
       
-	//if for some reason we can't achieve a right-handed system, exit
-	if ( new_P.determinant()-1.0 > 1e-6 )
-	  {
-	    std::cout << "Could not orient new axes properly" << std::endl;
-	    exit(1);
+      //if for some reason we can't achieve a right-handed system, exit
+      if ( new_P.determinant()-1.0 > 1e-6 )
+	{
+	  std::cout << "Could not orient new axes properly" << std::endl;
+	  exit(1);
 
-	  }
-	//update Eigenvector matrix
-	P = new_P;
+	}
+      //update Eigenvector matrix
+      P = new_P;
      
-	//swap Eigenvalues
-	double temp = eigen_vals[2];
-	eigen_vals[2] = eigen_vals[1];
-	eigen_vals[1] = temp;
+      //swap Eigenvalues
+      double temp = eigen_vals[2];
+      eigen_vals[2] = eigen_vals[1];
+      eigen_vals[1] = temp;
       
-      }
+    }
 
-    A = eigen_vals[0];
-    B = eigen_vals[1];
-    C = eigen_vals[2];
-    D = 0.0;
-    E = 0.0; 
-    F = 0.0;
+  A = eigen_vals[0];
+  B = eigen_vals[1];
+  C = eigen_vals[2];
+  D = 0.0;
+  E = 0.0; 
+  F = 0.0;
 
    
 
-    //calculate angles of rotation
-    //P = P.transpose(); //transpose P to get the correct conversion
+  //calculate angles of rotation
+  //P = P.transpose(); //transpose P to get the correct conversion
 
-    //populate the rotation matrix
-    std::copy(P.array(), P.array()+9, rotation_mat);
-  }
-
-  virtual double getFarthestExtentFromOrigin ( ) const {
-    return sqrt( extents[0]*extents[0] + extents[1]*extents[1] + extents[2]*extents[2]);
-  }
-  
-  virtual iBase_EntityHandle getHandle( bool positive, iGeom_Instance& igm, double world_size )
-  { 
-
-    std::cout << "Final Coeffs of GQ" << std::endl;
-
-    std::cout << "A= " << A << std::endl;
-    std::cout << "B= " << B << std::endl;
-    std::cout << "C= " << C << std::endl;
-    std::cout << "D= " << D << std::endl;
-    std::cout << "E= " << E << std::endl;
-    std::cout << "F= " << F << std::endl;
-    std::cout << "K= " << K << std::endl;
-
-
-    iBase_EntityHandle gq_handle;
-    int igm_result=0;
-    iGeom_GQ(igm,A,B,C,D,E,F,G,H,J,K,world_size,&gq_handle,&igm_result);
-    CHECK_IGEOM( igm_result, "Creating intial GQ");
-
-    Transform gq_transform(rotation_mat,translation);
-
-    //move back to original orientation
-    applyReverseTransform( gq_transform, igm, gq_handle);
-
-    double xmin,xmax,ymin,ymax,zmin,zmax;
-    iGeom_getBoundBox(igm,&xmin,&ymin,&zmin,&xmax,&ymax,&zmax,&igm_result);
-    extents[0] = ( fabs(xmin) > fabs(xmax) ) ? xmin : xmax;
-    extents[1] = ( fabs(ymin) > fabs(ymax) ) ? ymin : ymax;
-    extents[2] = ( fabs(zmin) > fabs(zmax) ) ? zmin : zmax;
-
-    return gq_handle;
-  }
-
-};
+  //populate the rotation matrix
+  std::copy(P.array(), P.array()+9, rotation_mat);
+}
 
 
 class TorusSurface : public SurfaceVolume {

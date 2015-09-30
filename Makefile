@@ -26,6 +26,11 @@ mcnp2cad: ${CXXOBJS} Makefile
 # The following may be more convenient than the above on Linux
 #	libtool --mode=link ${CXX} ${CXXFLAGS} -o $@ ${CXXOBJS}  ${LDFLAGS} 
 
+export CXX 
+export CXXFLAGS
+export IGEOM_CPPFLAGS
+export LDFLAGS
+export CXXOBJS
 
 geometry.o: geometry.cpp geometry.hpp dataref.hpp
 volumes.o: volumes.cpp volumes.hpp geometry.hpp MCNPInput.hpp
@@ -39,6 +44,9 @@ ProgOptions.o: ProgOptions.cpp ProgOptions.hpp
 
 clean:
 	rm -rf mcnp2cad *.o
+
+subsystem:
+	$(MAKE) -C ./tests/
 
 #
 # Makefile for Sphinx documentation
@@ -91,7 +99,7 @@ help:
 	@echo "  linkcheck  to check all external links for integrity"
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 
-gh-clean gh-revert clean:
+gh-clean gh-revert ghclean:
 	-rm -rf $(GHBUILDDIR)
 
 gh-preview html:
