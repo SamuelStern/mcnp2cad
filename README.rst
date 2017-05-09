@@ -19,14 +19,8 @@ The following groups intend to support such implementations:
   implementation of CGM_ that is based on the OpenCascade_ solid modeling
   engine.  This version may support a command line tool.
 
-<<<<<<< bbf0aadd2455369bcd9450763caf45ce54d3ac86
-This project creates a shared object file which is called by the Trelis plugin
-or the command line interface created with the -DBUILD_CLI=true flag.
-
-Bug reports are appreciated.
 =======
-Bug reports are appreciated - please post an issue in our `Github repository<https://github.com/svalinn/mcnp2cad/issues>`_.
->>>>>>> minor editing and update Authors
+Bug reports are appreciated - please post an issue in our `Github repository <https://github.com/svalinn/mcnp2cad/issues>`_.
 
 This tool is based on an concept first developed at Argonne National
 Laboratory.
